@@ -13,8 +13,8 @@ RUN npm run build
 # ==========================================
 # TAHAP 2: Build Binary Golang + SQLite
 # ==========================================
-FROM golang:1.24-alpine AS backend-builder
-# modernc.org/sqlite adalah Pure Go SQLite, tidak membutuhkan gcc/CGO
+FROM golang:alpine AS backend-builder
+ENV GOTOOLCHAIN=auto
 WORKDIR /app
 
 COPY backend/go.mod backend/go.sum ./
