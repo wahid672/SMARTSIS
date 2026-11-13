@@ -71,6 +71,12 @@ func MigrateSchema() {
 			FOREIGN KEY (wali_user_id) REFERENCES users(id) ON DELETE CASCADE,
 			FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS settings (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL,
+			description TEXT
+		);`,
 	}
 
 	for _, q := range queries {
@@ -108,7 +114,8 @@ func SeedInitialData() {
 		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", 5},
 		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", 6},
 		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", 7},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", 8},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", 8},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", 9},
 	}
 
 	for _, m := range menus {
@@ -146,6 +153,23 @@ func SeedInitialData() {
 	// Relasikan 2 Siswa ke Wali Pak Ahmad (ID: 2)
 	DB.Exec(`INSERT OR IGNORE INTO wali_siswa (wali_user_id, siswa_id, hubungan) VALUES (2, 1, 'Ayah Kandung')`)
 	DB.Exec(`INSERT OR IGNORE INTO wali_siswa (wali_user_id, siswa_id, hubungan) VALUES (2, 2, 'Ayah Kandung')`)
+
+	// 8. Pengaturan Identitas Lembaga Default
+	settingsDefault := []struct {
+		key, val, desc string
+	}{
+		{"app_name", "SMARTSIS", "Nama Singkat Aplikasi"},
+		{"school_name", "Pondok Pesantren & Madrasah Terpadu", "Nama Resmi Lembaga / Sekolah"},
+		{"tagline", "Sistem Informasi Sekolah & Pesantren Terpadu", "Motto atau Deskripsi Singkat"},
+		{"phone", "08123456789", "Nomor Kontak / WhatsApp Resmi Lembaga"},
+		{"email", "info@sekolah.sch.id", "Email Resmi Lembaga"},
+		{"address", "Jl. Pesantren No. 01, Kompleks Pendidikan", "Alamat Lembaga"},
+		{"logo_url", "", "URL / Base64 Logo Lembaga"},
+	}
+
+	for _, s := range settingsDefault {
+		DB.Exec(`INSERT OR IGNORE INTO settings (key, value, description) VALUES (?, ?, ?)`, s.key, s.val, s.desc)
+	}
 
 	log.Println("Seeding initial data selesai.")
 }

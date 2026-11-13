@@ -6,12 +6,14 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content class="bg-white">
           <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              S
+            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden shrink-0">
+              <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain p-1" />
+              <span v-else>{{ settingsStore.app_name.charAt(0) }}</span>
             </div>
-            <div>
-              <h2 class="font-bold text-slate-800 text-sm leading-tight">SMARTSIS</h2>
-              <span class="text-[11px] text-brand-600 font-medium">{{ authStore.roleLabel }}</span>
+            <div class="min-w-0">
+              <h2 class="font-bold text-slate-800 text-sm leading-tight truncate">{{ settingsStore.app_name }}</h2>
+              <p class="text-[10px] text-slate-400 truncate">{{ settingsStore.school_name }}</p>
+              <span class="inline-block text-[10px] text-brand-600 font-semibold mt-0.5">{{ authStore.roleLabel }}</span>
             </div>
           </div>
 
@@ -63,7 +65,10 @@
             </ion-buttons>
 
             <ion-title class="text-sm font-bold text-slate-800">
-              SMARTSIS
+              <div class="flex items-center gap-2">
+                <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-6 h-6 object-contain" />
+                <span>{{ settingsStore.app_name }}</span>
+              </div>
             </ion-title>
 
             <!-- Dropdown Multi-Siswa di Header Mobile Wali -->
@@ -120,11 +125,13 @@ import {
 } from '@ionic/vue'
 import {
   homeOutline, calendarOutline, ribbonOutline, walletOutline,
-  peopleOutline, briefcaseOutline, shieldCheckmarkOutline, personOutline, logOutOutline
+  peopleOutline, briefcaseOutline, shieldCheckmarkOutline, personOutline, logOutOutline, settingsOutline
 } from 'ionicons/icons'
 import { useAuthStore } from '@/stores/auth'
+import { useSettingsStore } from '@/stores/settings'
 
 const authStore = useAuthStore()
+const settingsStore = useSettingsStore()
 const router = useRouter()
 
 // Mapping icon string ke Ionicons
@@ -136,6 +143,7 @@ const iconMap = {
   'people-outline': peopleOutline,
   'briefcase-outline': briefcaseOutline,
   'shield-checkmark-outline': shieldCheckmarkOutline,
+  'settings-outline': settingsOutline,
   'person-outline': personOutline
 }
 

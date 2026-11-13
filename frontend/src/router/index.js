@@ -6,6 +6,7 @@ import TabsLayout from '@/views/TabsLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import ProfilView from '@/views/ProfilView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
+import PengaturanView from '@/views/PengaturanView.vue'
 
 const routes = [
   {
@@ -79,6 +80,12 @@ const routes = [
         name: 'AdminRoles',
         component: PlaceholderView,
         meta: { title: 'Pengaturan Hak Akses & Menu' }
+      },
+      {
+        path: 'pengaturan',
+        name: 'AdminPengaturan',
+        component: PengaturanView,
+        meta: { title: 'Identitas Lembaga' }
       }
     ]
   }

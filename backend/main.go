@@ -36,10 +36,16 @@ func main() {
 		// Public Auth (Smart Login: Email pegawai vs No HP wali)
 		api.POST("/auth/login", handlers.Login)
 
+		// Public Settings (Agar halaman login bisa menampilkan nama lembaga & logo)
+		api.GET("/settings", handlers.GetSettings)
+
 		// Protected Route
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
 		{
+			// Update Settings (Hanya bisa diakses setelah login)
+			protected.POST("/settings", handlers.UpdateSettings)
+
 			protected.GET("/user/profile", func(c *gin.Context) {
 				userID := c.MustGet("user_id")
 				c.JSON(http.StatusOK, gin.H{
