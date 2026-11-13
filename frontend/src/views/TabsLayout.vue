@@ -62,13 +62,13 @@
               </div>
             </div>
 
-            <!-- Tombol Keluar di Bawah Sidebar (Di atas gelombang emas) -->
-            <div class="p-3 mb-4">
+            <!-- Tombol Keluar di Bawah Sidebar: Jelas, Bersih & Kontras Tinggi -->
+            <div class="p-3 mb-4 pt-3 border-t border-white/10">
               <button
                 @click="handleLogout"
-                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-300 bg-rose-950/40 hover:bg-rose-500/30 hover:text-white transition-all border border-rose-500/30 shadow-sm"
+                class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-300 hover:bg-rose-500/20 hover:text-white transition-all border border-rose-500/30 shadow-sm"
               >
-                <ion-icon :icon="logOutOutline" class="text-base shrink-0"></ion-icon>
+                <ion-icon :icon="logOutOutline" class="text-base shrink-0 text-rose-400"></ion-icon>
                 <span>Keluar Akun</span>
               </button>
             </div>
