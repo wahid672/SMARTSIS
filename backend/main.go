@@ -1,9 +1,14 @@
 package main
 
 import (
+	"embed"
+	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,6 +16,11 @@ import (
 	"smartsis-backend/handlers"
 	"smartsis-backend/middleware"
 )
+
+// Embed folder hasil build frontend Ionic Vue 3 ke dalam binary executable
+//
+//go:embed all:frontend/dist
+var frontendFS embed.FS
 
 func main() {
 	// Inisialisasi Database SQLite
@@ -20,10 +30,10 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 
-	// API Routing
+	// 1. API Routing
 	api := r.Group("/api")
 	{
-		// Public Auth
+		// Public Auth (Smart Login: Email pegawai vs No HP wali)
 		api.POST("/auth/login", handlers.Login)
 
 		// Protected Route
@@ -38,7 +48,7 @@ func main() {
 				})
 			})
 
-			// Endpoint mengambil menu dinamis (bisa dipanggil kapan saja)
+			// Endpoint mengambil menu dinamis
 			protected.GET("/user/menus", func(c *gin.Context) {
 				roleID := int(c.MustGet("role_id").(float64))
 				menus, err := handlers.GetMenusByRole(roleID)
@@ -51,12 +61,51 @@ func main() {
 		}
 	}
 
+	// 2. Serve Frontend PWA dari Single Binary (go:embed)
+	distFS, err := fs.Sub(frontendFS, "frontend/dist")
+	if err == nil {
+		fileServer := http.FileServer(http.FS(distFS))
+
+		r.NoRoute(func(c *gin.Context) {
+			path := c.Request.URL.Path
+
+			// Jika request API yang 404, tetap kembalikan JSON
+			if strings.HasPrefix(path, "/api") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Endpoint API tidak ditemukan"})
+				return
+			}
+
+			// Cek apakah file fisik ada di static build
+			f, err := distFS.Open(strings.TrimPrefix(path, "/"))
+			if err == nil {
+				f.Close()
+				fileServer.ServeHTTP(c.Writer, c.Request)
+				return
+			}
+
+			// Jika bukan file fisik (misal rute SPA seperti /tabs/dashboard, /login), kembalikan index.html
+			indexFile, err := distFS.Open("index.html")
+			if err == nil {
+				defer indexFile.Close()
+				stat, _ := indexFile.Stat()
+				modTime := time.Now()
+				if stat != nil {
+					modTime = stat.ModTime()
+				}
+				http.ServeContent(c.Writer, c.Request, "index.html", modTime, indexFile.(io.ReadSeeker))
+				return
+			}
+
+			c.String(http.StatusNotFound, "File static tidak ditemukan")
+		})
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("SMARTSIS Backend menyala di port :%s", port)
+	log.Printf("SMARTSIS Backend & Frontend PWA menyala di port :%s", port)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Gagal menjalankan server: %v", err)
 	}

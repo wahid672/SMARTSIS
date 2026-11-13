@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  smartsis:
+    # Ganti dengan image dari GHCR setelah workflow GitHub Actions berjalan:
+    # image: ghcr.io/wahid672/smartsis:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartsis_app
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      # Data SQLite persisten di host
+      - ./data:/app/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/siakad.db
+      - GIN_MODE=release
+      - TZ=Asia/Jakarta
