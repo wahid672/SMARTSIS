@@ -55,9 +55,13 @@
       <!-- KONTEN UTAMA & BOTTOM TABS (UNTUK SMARTPHONE) -->
       <div id="main-content" class="ion-page">
         
-        <!-- Header Mobile dengan Switcher Siswa -->
+        <!-- Header Mobile -->
         <ion-header class="ion-no-border shadow-sm bg-white md:hidden">
           <ion-toolbar class="bg-white px-3">
+            <ion-buttons slot="start">
+              <ion-menu-button color="dark"></ion-menu-button>
+            </ion-buttons>
+
             <ion-title class="text-sm font-bold text-slate-800">
               SMARTSIS
             </ion-title>
@@ -81,16 +85,21 @@
         <ion-tabs>
           <ion-router-outlet></ion-router-outlet>
 
-          <!-- Bottom Navigation Bar Mobile (Hanya muncul di HP) -->
+          <!-- Bottom Navigation Bar Mobile: Hanya 3 Menu Ringkas & Rapi -->
           <ion-tab-bar slot="bottom" class="border-t border-slate-100 bg-white/95 backdrop-blur md:hidden">
-            <ion-tab-button
-              v-for="menu in mobileTabs"
-              :key="menu.code"
-              :tab="menu.code"
-              :href="menu.path"
-            >
-              <ion-icon :icon="getIcon(menu.icon)"></ion-icon>
-              <ion-label class="text-[10px]">{{ menu.title }}</ion-label>
+            <ion-tab-button tab="dashboard" href="/tabs/dashboard">
+              <ion-icon :icon="homeOutline"></ion-icon>
+              <ion-label class="text-[11px] font-medium">Beranda</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="profil" href="/tabs/profil">
+              <ion-icon :icon="personOutline"></ion-icon>
+              <ion-label class="text-[11px] font-medium">Profil</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="logout" @click="handleLogout">
+              <ion-icon :icon="logOutOutline" class="text-rose-500"></ion-icon>
+              <ion-label class="text-[11px] font-medium text-rose-500">Keluar</ion-label>
             </ion-tab-button>
           </ion-tab-bar>
         </ion-tabs>
@@ -106,7 +115,8 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   IonPage, IonSplitPane, IonMenu, IonContent, IonHeader, IonToolbar, IonTitle,
-  IonList, IonItem, IonIcon, IonLabel, IonTabs, IonTabBar, IonTabButton, IonRouterOutlet
+  IonList, IonItem, IonIcon, IonLabel, IonTabs, IonTabBar, IonTabButton, IonRouterOutlet,
+  IonButtons, IonMenuButton
 } from '@ionic/vue'
 import {
   homeOutline, calendarOutline, ribbonOutline, walletOutline,
