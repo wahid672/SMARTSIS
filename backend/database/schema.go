@@ -53,6 +53,14 @@ func MigrateSchema() {
 			FOREIGN KEY (role_id) REFERENCES roles(id)
 		);`,
 
+		`CREATE TABLE IF NOT EXISTS kelas (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			nama_kelas TEXT NOT NULL UNIQUE,
+			tingkat TEXT NOT NULL,
+			wali_kelas TEXT,
+			keterangan TEXT
+		);`,
+
 		`CREATE TABLE IF NOT EXISTS siswa (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			nis TEXT NOT NULL UNIQUE,
@@ -113,10 +121,11 @@ func SeedInitialData() {
 		{"nilai", "Nilai & Rapor", "ribbon-outline", "/tabs/nilai", "AKADEMIK", 3},
 		{"spp", "Keuangan / SPP", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
 		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 5},
-		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 6},
-		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 7},
-		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 8},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 9},
+		{"kelas_mgmt", "Data Kelas", "school-outline", "/admin/kelas", "DATA MASTER", 6},
+		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 7},
+		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 8},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 9},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 10},
 	}
 
 	// Pastikan kolom category ada jika tabel sudah ada sebelumnya
@@ -159,6 +168,19 @@ func SeedInitialData() {
 	// Relasikan 2 Siswa ke Wali Pak Ahmad (ID: 2)
 	DB.Exec(`INSERT OR IGNORE INTO wali_siswa (wali_user_id, siswa_id, hubungan) VALUES (2, 1, 'Ayah Kandung')`)
 	DB.Exec(`INSERT OR IGNORE INTO wali_siswa (wali_user_id, siswa_id, hubungan) VALUES (2, 2, 'Ayah Kandung')`)
+
+	// 7b. Data Kelas Contoh
+	kelasDefault := []struct {
+		nama, tingkat, ket string
+	}{
+		{"VII-A", "Kelas 7", "Putra - Reguler"},
+		{"VII-B", "Kelas 7", "Putri - Reguler"},
+		{"VIII-A", "Kelas 8", "Putra - Reguler"},
+		{"IX-B", "Kelas 9", "Putri - Tahfidz"},
+	}
+	for _, k := range kelasDefault {
+		DB.Exec(`INSERT OR IGNORE INTO kelas (nama_kelas, tingkat, keterangan) VALUES (?, ?, ?)`, k.nama, k.tingkat, k.ket)
+	}
 
 	// 8. Pengaturan Identitas Lembaga Default
 	settingsDefault := []struct {

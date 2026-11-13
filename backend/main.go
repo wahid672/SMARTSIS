@@ -56,6 +56,18 @@ func main() {
 			protected.PUT("/admin/pegawai/:id", handlers.UpdatePegawai)
 			protected.DELETE("/admin/pegawai/:id", handlers.DeletePegawai)
 
+			// Kelas Management
+			protected.GET("/admin/kelas", handlers.GetAllKelas)
+			protected.POST("/admin/kelas", handlers.CreateKelas)
+			protected.PUT("/admin/kelas/:id", handlers.UpdateKelas)
+			protected.DELETE("/admin/kelas/:id", handlers.DeleteKelas)
+
+			// Siswa & Wali Management
+			protected.GET("/admin/siswa", handlers.GetAllSiswa)
+			protected.POST("/admin/siswa", handlers.CreateSiswa)
+			protected.PUT("/admin/siswa/:id", handlers.UpdateSiswa)
+			protected.DELETE("/admin/siswa/:id", handlers.DeleteSiswa)
+
 			// Update Settings (Hanya bisa diakses setelah login)
 			protected.POST("/settings", handlers.UpdateSettings)
 

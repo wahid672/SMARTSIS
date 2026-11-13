@@ -9,6 +9,8 @@ import PlaceholderView from '@/views/PlaceholderView.vue'
 import PengaturanView from '@/views/PengaturanView.vue'
 import RolesView from '@/views/RolesView.vue'
 import PegawaiView from '@/views/PegawaiView.vue'
+import SiswaView from '@/views/SiswaView.vue'
+import KelasView from '@/views/KelasView.vue'
 
 const routes = [
   {
@@ -62,8 +64,14 @@ const routes = [
       {
         path: '/admin/siswa',
         name: 'AdminSiswa',
-        component: PlaceholderView,
+        component: SiswaView,
         meta: { title: 'Manajemen Data Siswa' }
+      },
+      {
+        path: '/admin/kelas',
+        name: 'AdminKelas',
+        component: KelasView,
+        meta: { title: 'Master Data Kelas' }
       },
       {
         path: '/admin/pegawai',
