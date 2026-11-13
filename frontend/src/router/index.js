@@ -22,7 +22,7 @@ const routes = [
     meta: { public: true }
   },
   {
-    path: '/tabs/',
+    path: '/app',
     component: TabsLayout,
     children: [
       {
@@ -30,61 +30,55 @@ const routes = [
         redirect: '/tabs/dashboard'
       },
       {
-        path: 'dashboard',
+        path: '/tabs/dashboard',
         name: 'Dashboard',
         component: DashboardView,
         meta: { title: 'Beranda' }
       },
       {
-        path: 'presensi',
+        path: '/tabs/presensi',
         name: 'Presensi',
         component: PlaceholderView,
         meta: { title: 'Presensi & Absensi' }
       },
       {
-        path: 'nilai',
+        path: '/tabs/nilai',
         name: 'Nilai',
         component: PlaceholderView,
         meta: { title: 'Nilai & Rapor' }
       },
       {
-        path: 'spp',
+        path: '/tabs/spp',
         name: 'SPP',
         component: PlaceholderView,
         meta: { title: 'Keuangan & SPP' }
       },
       {
-        path: 'profil',
+        path: '/tabs/profil',
         name: 'Profil',
         component: ProfilView,
         meta: { title: 'Profil Akun' }
-      }
-    ]
-  },
-  {
-    path: '/admin/',
-    component: TabsLayout,
-    children: [
+      },
       {
-        path: 'siswa',
+        path: '/admin/siswa',
         name: 'AdminSiswa',
         component: PlaceholderView,
         meta: { title: 'Manajemen Data Siswa' }
       },
       {
-        path: 'pegawai',
+        path: '/admin/pegawai',
         name: 'AdminPegawai',
         component: PegawaiView,
         meta: { title: 'Manajemen Pegawai & Guru' }
       },
       {
-        path: 'roles',
+        path: '/admin/roles',
         name: 'AdminRoles',
         component: RolesView,
         meta: { title: 'Pengaturan Hak Akses & Menu' }
       },
       {
-        path: 'pengaturan',
+        path: '/admin/pengaturan',
         name: 'AdminPengaturan',
         component: PengaturanView,
         meta: { title: 'Identitas Lembaga' }

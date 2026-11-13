@@ -52,6 +52,7 @@
                     v-for="menu in group"
                     :key="menu.code"
                     :to="menu.path"
+                    replace
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group"
                     :class="route.path === menu.path ? 'bg-amber-400 text-amber-950 shadow-md font-extrabold' : 'text-sky-100 hover:bg-white/15 hover:text-white'"
                   >
