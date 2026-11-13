@@ -6,9 +6,11 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content class="bg-white">
           <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden shrink-0">
-              <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain p-1" />
-              <span v-else>{{ settingsStore.app_name.charAt(0) }}</span>
+            <div class="w-10 h-10 flex items-center justify-center shrink-0">
+              <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain" />
+              <div v-else class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                {{ settingsStore.app_name.charAt(0) }}
+              </div>
             </div>
             <div class="min-w-0">
               <h2 class="font-bold text-slate-800 text-sm leading-tight truncate">{{ settingsStore.app_name }}</h2>

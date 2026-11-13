@@ -28,7 +28,7 @@
           <div class="border-b border-slate-100 pb-5">
             <label class="block text-xs font-semibold text-slate-700 mb-2">Logo Lembaga</label>
             <div class="flex items-center gap-4">
-              <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center overflow-hidden shrink-0">
+              <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                 <img v-if="form.logo_url" :src="form.logo_url" alt="Logo" class="w-full h-full object-contain p-1" />
                 <ion-icon v-else :icon="schoolOutline" class="text-3xl text-emerald-600"></ion-icon>
               </div>

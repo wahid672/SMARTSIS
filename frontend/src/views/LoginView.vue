@@ -5,13 +5,24 @@
         
         <!-- Header / Logo -->
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-brand-500 text-white shadow-lg shadow-emerald-200 mb-3 overflow-hidden">
-            <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain p-2" />
-            <ion-icon v-else :icon="schoolOutline" class="text-4xl"></ion-icon>
+          <!-- Logo Wadah Transparan: Tidak ada background hijau kotak jika sudah ada logo -->
+          <div class="inline-flex items-center justify-center w-24 h-24 mb-4">
+            <img
+              v-if="settingsStore.logo_url"
+              :src="settingsStore.logo_url"
+              alt="Logo Lembaga"
+              class="w-full h-full object-contain drop-shadow-sm"
+            />
+            <div
+              v-else
+              class="w-20 h-20 rounded-2xl bg-brand-500 text-white shadow-lg shadow-emerald-200 flex items-center justify-center"
+            >
+              <ion-icon :icon="schoolOutline" class="text-4xl"></ion-icon>
+            </div>
           </div>
+
           <h1 class="text-2xl font-bold tracking-tight text-slate-800">{{ settingsStore.app_name }}</h1>
-          <p class="text-sm font-medium text-emerald-700 mt-0.5">{{ settingsStore.school_name }}</p>
-          <p class="text-xs text-slate-500 mt-0.5">{{ settingsStore.tagline }}</p>
+          <p class="text-sm font-semibold text-emerald-700 mt-2">{{ settingsStore.school_name }}</p>
         </div>
 
         <!-- Kartu Login Pintar -->
@@ -81,6 +92,11 @@
           </div>
 
         </div>
+
+        <!-- Tagline sebagai Footer di Bagian Bawah Halaman -->
+        <footer v-if="settingsStore.tagline" class="mt-8 text-center text-xs text-slate-400">
+          <p>{{ settingsStore.tagline }}</p>
+        </footer>
 
       </div>
     </ion-content>
