@@ -7,6 +7,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import ProfilView from '@/views/ProfilView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
 import PengaturanView from '@/views/PengaturanView.vue'
+import RolesView from '@/views/RolesView.vue'
 
 const routes = [
   {
@@ -78,7 +79,7 @@ const routes = [
       {
         path: 'roles',
         name: 'AdminRoles',
-        component: PlaceholderView,
+        component: RolesView,
         meta: { title: 'Pengaturan Hak Akses & Menu' }
       },
       {

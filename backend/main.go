@@ -43,6 +43,13 @@ func main() {
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware())
 		{
+			// RBAC Management
+			protected.GET("/admin/roles", handlers.GetAllRoles)
+			protected.POST("/admin/roles", handlers.CreateRole)
+			protected.DELETE("/admin/roles/:id", handlers.DeleteRole)
+			protected.GET("/admin/roles/:id/permissions", handlers.GetRolePermissions)
+			protected.POST("/admin/roles/:id/permissions", handlers.UpdateRolePermissions)
+
 			// Update Settings (Hanya bisa diakses setelah login)
 			protected.POST("/settings", handlers.UpdateSettings)
 
