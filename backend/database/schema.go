@@ -86,6 +86,56 @@ func MigrateSchema() {
 			value TEXT NOT NULL,
 			description TEXT
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS tahun_ajaran (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			nama_tahun TEXT NOT NULL,
+			semester TEXT NOT NULL CHECK(semester IN ('Ganjil', 'Genap')),
+			is_active INTEGER DEFAULT 0
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS pos_keuangan (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			nama_pos TEXT NOT NULL,
+			tipe TEXT NOT NULL CHECK(tipe IN ('masuk', 'keluar')),
+			keterangan TEXT
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS transaksi_kas (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			pos_id INTEGER NOT NULL,
+			kode_transaksi TEXT NOT NULL,
+			tanggal DATE NOT NULL,
+			tipe TEXT NOT NULL CHECK(tipe IN ('masuk', 'keluar')),
+			nominal REAL NOT NULL,
+			keterangan TEXT,
+			created_by INTEGER,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (pos_id) REFERENCES pos_keuangan(id)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS pos_tagihan (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			nama_tagihan TEXT NOT NULL,
+			tipe_periode TEXT NOT NULL CHECK(tipe_periode IN ('bulanan', 'semester', 'tahunan')),
+			nominal REAL NOT NULL,
+			keterangan TEXT
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS tagihan_siswa (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			siswa_id INTEGER NOT NULL,
+			pos_tagihan_id INTEGER NOT NULL,
+			tahun_ajaran_id INTEGER NOT NULL,
+			periode TEXT NOT NULL,
+			nominal REAL NOT NULL,
+			terbayar REAL DEFAULT 0,
+			status TEXT NOT NULL DEFAULT 'belum_lunas' CHECK(status IN ('belum_lunas', 'lunas')),
+			tanggal_bayar DATETIME,
+			FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE,
+			FOREIGN KEY (pos_tagihan_id) REFERENCES pos_tagihan(id),
+			FOREIGN KEY (tahun_ajaran_id) REFERENCES tahun_ajaran(id)
+		);`,
 	}
 
 	for _, q := range queries {
@@ -119,13 +169,14 @@ func SeedInitialData() {
 		{"dashboard", "Beranda", "home-outline", "/tabs/dashboard", "UTAMA", 1},
 		{"presensi", "Presensi & Absensi", "calendar-outline", "/tabs/presensi", "AKADEMIK", 2},
 		{"nilai", "Nilai & Rapor", "ribbon-outline", "/tabs/nilai", "AKADEMIK", 3},
-		{"spp", "Keuangan / SPP", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
+		{"spp", "Keuangan", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
 		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 5},
 		{"kelas_mgmt", "Data Kelas", "school-outline", "/admin/kelas", "DATA MASTER", 6},
-		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 7},
-		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 8},
-		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 9},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 10},
+		{"tahun_ajaran_mgmt", "Tahun Ajaran", "calendar-number-outline", "/admin/tahun-ajaran", "DATA MASTER", 7},
+		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 8},
+		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 9},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 10},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 11},
 	}
 
 	// Pastikan kolom category ada jika tabel sudah ada sebelumnya
@@ -181,6 +232,35 @@ func SeedInitialData() {
 	for _, k := range kelasDefault {
 		DB.Exec(`INSERT OR IGNORE INTO kelas (nama_kelas, tingkat, keterangan) VALUES (?, ?, ?)`, k.nama, k.tingkat, k.ket)
 	}
+
+	// 7c. Tahun Ajaran Awal
+	DB.Exec(`INSERT OR IGNORE INTO tahun_ajaran (id, nama_tahun, semester, is_active) VALUES (1, '2026/2027', 'Ganjil', 1)`)
+
+	// 7d. Pos Keuangan & Pos Tagihan Awal
+	posList := []struct {
+		nama, tipe, ket string
+	}{
+		{"SPP Santri", "masuk", "Penerimaan rutin iuran bulanan santri"},
+		{"Infaq Pembangunan", "masuk", "Penerimaan dana pembangunan/gedung"},
+		{"Dana Bantuan Operasional", "masuk", "Dana bantuan operasional sekolah/pesantren"},
+		{"Gaji Staf & Dewan Guru", "keluar", "Pengeluaran rutin honor dewan asatidz dan staf"},
+		{"Operasional Dapur & Santri", "keluar", "Pengeluaran makan & konsumsi harian"},
+		{"Listrik, Air & Internet", "keluar", "Biaya utilitas sarana dan prasarana"},
+	}
+	for _, p := range posList {
+		DB.Exec(`INSERT OR IGNORE INTO pos_keuangan (nama_pos, tipe, keterangan) VALUES (?, ?, ?)`, p.nama, p.tipe, p.ket)
+	}
+
+	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
+		VALUES (1, 'SPP Santri Bulanan', 'bulanan', 350000, 'SPP reguler termasuk asrama & konsumsi')`)
+	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
+		VALUES (2, 'Daftar Ulang Tahunan', 'tahunan', 1500000, 'Iuran tahunan fasilitas dan seragam santri')`)
+
+	// Generate contoh tagihan siswa untuk 2 siswa demo
+	DB.Exec(`INSERT OR IGNORE INTO tagihan_siswa (id, siswa_id, pos_tagihan_id, tahun_ajaran_id, periode, nominal, terbayar, status, tanggal_bayar)
+		VALUES (1, 1, 1, 1, 'November 2026', 350000, 350000, 'lunas', '2026-11-05 08:30:00')`)
+	DB.Exec(`INSERT OR IGNORE INTO tagihan_siswa (id, siswa_id, pos_tagihan_id, tahun_ajaran_id, periode, nominal, terbayar, status, tanggal_bayar)
+		VALUES (2, 2, 1, 1, 'November 2026', 350000, 0, 'belum_lunas', NULL)`)
 
 	// 8. Pengaturan Identitas Lembaga Default
 	settingsDefault := []struct {

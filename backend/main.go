@@ -68,6 +68,21 @@ func main() {
 			protected.PUT("/admin/siswa/:id", handlers.UpdateSiswa)
 			protected.DELETE("/admin/siswa/:id", handlers.DeleteSiswa)
 
+			// Master Tahun Ajaran
+			protected.GET("/admin/tahun-ajaran", handlers.GetAllTahunAjaran)
+			protected.POST("/admin/tahun-ajaran", handlers.CreateTahunAjaran)
+			protected.PUT("/admin/tahun-ajaran/:id/activate", handlers.SetActiveTahunAjaran)
+			protected.DELETE("/admin/tahun-ajaran/:id", handlers.DeleteTahunAjaran)
+
+			// Modul Keuangan & SPP
+			protected.GET("/keuangan/summary", handlers.GetCashflowSummary)
+			protected.GET("/keuangan/pos", handlers.GetPosKeuangan)
+			protected.POST("/keuangan/pos", handlers.CreatePosKeuangan)
+			protected.GET("/keuangan/kas", handlers.GetTransaksiKas)
+			protected.POST("/keuangan/kas", handlers.CreateTransaksiKas)
+			protected.GET("/keuangan/tagihan", handlers.GetAllTagihan)
+			protected.POST("/keuangan/tagihan/:id/bayar", handlers.BayarTagihan)
+
 			// Update Settings (Hanya bisa diakses setelah login)
 			protected.POST("/settings", handlers.UpdateSettings)
 

@@ -11,6 +11,8 @@ import RolesView from '@/views/RolesView.vue'
 import PegawaiView from '@/views/PegawaiView.vue'
 import SiswaView from '@/views/SiswaView.vue'
 import KelasView from '@/views/KelasView.vue'
+import KeuanganView from '@/views/KeuanganView.vue'
+import TahunAjaranView from '@/views/TahunAjaranView.vue'
 
 const routes = [
   {
@@ -51,9 +53,9 @@ const routes = [
       },
       {
         path: '/tabs/spp',
-        name: 'SPP',
-        component: PlaceholderView,
-        meta: { title: 'Keuangan & SPP' }
+        name: 'Keuangan',
+        component: KeuanganView,
+        meta: { title: 'Keuangan' }
       },
       {
         path: '/tabs/profil',
@@ -72,6 +74,12 @@ const routes = [
         name: 'AdminKelas',
         component: KelasView,
         meta: { title: 'Master Data Kelas' }
+      },
+      {
+        path: '/admin/tahun-ajaran',
+        name: 'AdminTahunAjaran',
+        component: TahunAjaranView,
+        meta: { title: 'Master Tahun Ajaran' }
       },
       {
         path: '/admin/pegawai',
