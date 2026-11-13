@@ -83,6 +83,11 @@ func main() {
 			protected.GET("/keuangan/tagihan", handlers.GetAllTagihan)
 			protected.POST("/keuangan/tagihan/:id/bayar", handlers.BayarTagihan)
 
+			// Modul Presensi & Absensi Santri
+			protected.GET("/presensi/kelas", handlers.GetPresensiByKelasDanTanggal)
+			protected.POST("/presensi/batch", handlers.SavePresensiBatch)
+			protected.GET("/presensi/wali", handlers.GetRekapPresensiWali)
+
 			// Update Settings (Hanya bisa diakses setelah login)
 			protected.POST("/settings", handlers.UpdateSettings)
 

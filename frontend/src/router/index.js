@@ -13,6 +13,7 @@ import SiswaView from '@/views/SiswaView.vue'
 import KelasView from '@/views/KelasView.vue'
 import KeuanganView from '@/views/KeuanganView.vue'
 import TahunAjaranView from '@/views/TahunAjaranView.vue'
+import PresensiView from '@/views/PresensiView.vue'
 
 const routes = [
   {
@@ -42,7 +43,7 @@ const routes = [
       {
         path: '/tabs/presensi',
         name: 'Presensi',
-        component: PlaceholderView,
+        component: PresensiView,
         meta: { title: 'Presensi & Absensi' }
       },
       {

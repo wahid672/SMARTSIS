@@ -136,6 +136,18 @@ func MigrateSchema() {
 			FOREIGN KEY (pos_tagihan_id) REFERENCES pos_tagihan(id),
 			FOREIGN KEY (tahun_ajaran_id) REFERENCES tahun_ajaran(id)
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS presensi_siswa (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			siswa_id INTEGER NOT NULL,
+			tanggal DATE NOT NULL,
+			status TEXT NOT NULL CHECK(status IN ('Hadir', 'Izin', 'Sakit', 'Alpa')),
+			keterangan TEXT,
+			recorded_by INTEGER,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			UNIQUE(siswa_id, tanggal),
+			FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE
+		);`,
 	}
 
 	for _, q := range queries {
@@ -261,6 +273,13 @@ func SeedInitialData() {
 		VALUES (1, 1, 1, 1, 'November 2026', 350000, 350000, 'lunas', '2026-11-05 08:30:00')`)
 	DB.Exec(`INSERT OR IGNORE INTO tagihan_siswa (id, siswa_id, pos_tagihan_id, tahun_ajaran_id, periode, nominal, terbayar, status, tanggal_bayar)
 		VALUES (2, 2, 1, 1, 'November 2026', 350000, 0, 'belum_lunas', NULL)`)
+
+	// 7e. Data Presensi Contoh
+	today := "2026-11-14"
+	DB.Exec(`INSERT OR IGNORE INTO presensi_siswa (siswa_id, tanggal, status, keterangan, recorded_by)
+		VALUES (1, ?, 'Hadir', 'Tepat waktu', 1)`, today)
+	DB.Exec(`INSERT OR IGNORE INTO presensi_siswa (siswa_id, tanggal, status, keterangan, recorded_by)
+		VALUES (2, ?, 'Hadir', 'Tepat waktu', 1)`, today)
 
 	// 8. Pengaturan Identitas Lembaga Default
 	settingsDefault := []struct {
