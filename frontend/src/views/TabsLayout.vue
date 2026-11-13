@@ -3,8 +3,8 @@
     <ion-split-pane content-id="main-content" when="md">
       
       <!-- SIDEBAR UNTUK TABLET & DESKTOP (MD/LG SCREEN) -->
-      <ion-menu content-id="main-content" type="overlay" class="border-r border-sky-950/20 shadow-xl">
-        <ion-content class="sidebar-wave-container text-white" :fullscreen="true">
+      <ion-menu content-id="main-content" type="overlay" class="border-r border-sky-950/20 shadow-xl" style="--background: #0f3057;">
+        <ion-content class="sidebar-wave-container text-white" :fullscreen="true" style="--background: #0f3057; background: #0f3057;">
           
           <div class="relative z-10 flex flex-col min-h-full">
             
