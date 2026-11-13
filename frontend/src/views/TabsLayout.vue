@@ -58,37 +58,8 @@
 
       <!-- KONTEN UTAMA & BOTTOM TABS (UNTUK SMARTPHONE) -->
       <div id="main-content" class="ion-page">
-        
-        <!-- Header Mobile -->
-        <ion-header class="ion-no-border shadow-sm bg-white md:hidden">
-          <ion-toolbar class="bg-white px-3">
-            <ion-buttons slot="start">
-              <ion-menu-button color="dark"></ion-menu-button>
-            </ion-buttons>
 
-            <ion-title class="text-sm font-bold text-slate-800">
-              <div class="flex items-center gap-2">
-                <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-6 h-6 object-contain" />
-                <span>{{ settingsStore.app_name }}</span>
-              </div>
-            </ion-title>
-
-            <!-- Dropdown Multi-Siswa di Header Mobile Wali -->
-            <div slot="end" v-if="authStore.isWali && authStore.daftarSiswa.length > 1" class="mr-2">
-              <select
-                :value="authStore.activeSiswa?.id"
-                @change="onSwitchSiswa($event)"
-                class="text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 focus:outline-none"
-              >
-                <option v-for="s in authStore.daftarSiswa" :key="s.id" :value="s.id">
-                  {{ s.nama_lengkap }}
-                </option>
-              </select>
-            </div>
-          </ion-toolbar>
-        </ion-header>
-
-        <!-- Ionic Tabs Shell -->
+        <!-- Ionic Tabs Shell (Header mobile dihilangkan, ruang layar penuh untuk konten) -->
         <ion-tabs>
           <ion-router-outlet></ion-router-outlet>
 

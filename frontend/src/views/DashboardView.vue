@@ -5,17 +5,30 @@
 
         <!-- Banner Selamat Datang & Status Siswa (Untuk Wali) -->
         <div v-if="authStore.isWali && authStore.activeSiswa" class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-5 text-white shadow-md shadow-emerald-600/10 mb-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="inline-block text-[11px] bg-white/20 backdrop-blur px-2.5 py-0.5 rounded-full font-medium mb-1">
-                Profil Santri / Siswa Aktif
-              </span>
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block text-[11px] bg-white/20 backdrop-blur px-2.5 py-0.5 rounded-full font-medium">
+                  Santri / Siswa Aktif
+                </span>
+                <!-- Switcher Cepat jika wali punya > 1 anak -->
+                <select
+                  v-if="authStore.daftarSiswa.length > 1"
+                  :value="authStore.activeSiswa.id"
+                  @change="onSwitchSiswa($event)"
+                  class="text-[11px] font-semibold text-emerald-900 bg-white/90 rounded-full px-2.5 py-0.5 focus:outline-none cursor-pointer"
+                >
+                  <option v-for="s in authStore.daftarSiswa" :key="s.id" :value="s.id">
+                    Pilih: {{ s.nama_lengkap }} ({{ s.kelas }})
+                  </option>
+                </select>
+              </div>
               <h1 class="text-xl font-bold">{{ authStore.activeSiswa.nama_lengkap }}</h1>
               <p class="text-xs text-emerald-100 mt-0.5">
                 NIS: {{ authStore.activeSiswa.nis }} • Kelas: {{ authStore.activeSiswa.kelas }} • {{ authStore.activeSiswa.hubungan }}
               </p>
             </div>
-            <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-xl font-bold">
+            <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-xl font-bold shrink-0">
               {{ authStore.activeSiswa.nama_lengkap.charAt(0) }}
             </div>
           </div>
@@ -108,5 +121,13 @@ const getIcon = (name) => iconMap[name] || homeOutline
 
 const navigateTo = (path) => {
   router.push(path)
+}
+
+const onSwitchSiswa = (e) => {
+  const selectedId = parseInt(e.target.value)
+  const target = authStore.daftarSiswa.find(s => s.id === selectedId)
+  if (target) {
+    authStore.setActiveSiswa(target)
+  }
 }
 </script>
