@@ -30,3 +30,46 @@ ion-split-pane {
   --side-width: 260px;
   --side-max-width: 280px;
 }
+
+/* Memastikan latar belakang ion-menu dan ion-content di sidebar berwarna biru navy solid */
+ion-menu {
+  --background: #0f3057;
+}
+
+ion-menu ion-content {
+  --background: #0f3057 !important;
+  background-color: #0f3057 !important;
+}
+
+/* Gelombang lengkung dekorasi ala desain di pojok kanan atas dan bawah */
+.sidebar-wave-container {
+  background: linear-gradient(180deg, #10375c 0%, #0c2b48 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-wave-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 90px;
+  background: radial-gradient(circle at 100% 0%, #f5a623 0%, rgba(245, 166, 35, 0.4) 35%, #185a9d 70%, transparent 100%);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar-wave-container::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  background: radial-gradient(ellipse at 50% 120%, #f5a623 0%, #20639b 45%, transparent 75%);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
