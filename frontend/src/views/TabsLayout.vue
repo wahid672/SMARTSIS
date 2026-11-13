@@ -3,33 +3,35 @@
     <ion-split-pane content-id="main-content" when="md">
       
       <!-- SIDEBAR UNTUK TABLET & DESKTOP (MD/LG SCREEN) -->
-      <ion-menu content-id="main-content" type="overlay" class="border-r border-slate-200/90 shadow-sm">
-        <ion-content class="bg-slate-900 text-slate-100">
+      <ion-menu content-id="main-content" type="overlay" class="border-r border-sky-950/20 shadow-lg">
+        <ion-content class="bg-[#0b3b60] text-slate-100">
           
-          <!-- Header Sidebar dengan Brand Sekolah -->
-          <div class="p-5 border-b border-slate-800/80 flex items-center gap-3 bg-slate-950/40">
-            <div class="w-10 h-10 flex items-center justify-center shrink-0">
+          <!-- Header Sidebar dengan Brand Sekolah & Badge Role Kuning Emas -->
+          <div class="p-5 border-b border-white/10 flex items-center gap-3 bg-[#082d4a]/70">
+            <div class="w-11 h-11 flex items-center justify-center shrink-0">
               <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain" />
-              <div v-else class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+              <div v-else class="w-11 h-11 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-bold text-lg shadow-sm">
                 {{ settingsStore.app_name.charAt(0) }}
               </div>
             </div>
             <div class="min-w-0">
-              <h2 class="font-bold text-white text-sm leading-tight truncate tracking-wide">{{ settingsStore.app_name }}</h2>
-              <p class="text-[10px] text-slate-400 truncate">{{ settingsStore.school_name }}</p>
-              <span class="inline-block text-[10px] text-emerald-400 font-semibold mt-0.5">{{ authStore.roleLabel }}</span>
+              <h2 class="font-extrabold text-white text-sm leading-tight truncate tracking-wide">{{ settingsStore.app_name }}</h2>
+              <p class="text-[10px] text-sky-200 truncate">{{ settingsStore.school_name }}</p>
+              <span class="inline-block text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-sm mt-1">
+                {{ authStore.roleLabel }}
+              </span>
             </div>
           </div>
 
           <!-- Switcher Siswa di Sidebar untuk Akun Wali -->
-          <div v-if="authStore.isWali && authStore.daftarSiswa.length > 0" class="p-3.5 mx-3 mt-3 bg-slate-800/80 rounded-xl border border-slate-700/60">
-            <label class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider block mb-1">
+          <div v-if="authStore.isWali && authStore.daftarSiswa.length > 0" class="p-3 mx-3 mt-3 bg-[#082d4a]/80 rounded-xl border border-white/10">
+            <label class="text-[10px] font-bold text-amber-300 uppercase tracking-wider block mb-1">
               Santri / Siswa Aktif:
             </label>
             <select
               :value="authStore.activeSiswa?.id"
               @change="onSwitchSiswa($event)"
-              class="w-full text-xs font-medium text-slate-200 bg-slate-900 border border-slate-700 rounded-lg p-2 focus:outline-none"
+              class="w-full text-xs font-semibold text-white bg-[#0b3b60] border border-white/20 rounded-lg p-2 focus:outline-none"
             >
               <option v-for="s in authStore.daftarSiswa" :key="s.id" :value="s.id">
                 {{ s.nama_lengkap }} ({{ s.kelas }})
@@ -37,10 +39,10 @@
             </select>
           </div>
 
-          <!-- Daftar Menu Berkelompok (Sub-kategori ala AdminLTE / Modern Dashboard) -->
+          <!-- Daftar Menu Berkelompok (Sub-kategori Sesuai Gambar Desain) -->
           <div class="px-3 py-4 space-y-4">
             <div v-for="(group, catName) in groupedMenus" :key="catName">
-              <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-1">
+              <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-sky-200/80 px-3 mb-1.5">
                 {{ catName }}
               </h3>
               <div class="space-y-1">
@@ -48,20 +50,20 @@
                   v-for="menu in group"
                   :key="menu.code"
                   :to="menu.path"
-                  class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group"
-                  :class="route.path === menu.path ? 'bg-brand-500 text-white shadow-sm' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group"
+                  :class="route.path === menu.path ? 'bg-amber-400 text-amber-950 shadow-md font-extrabold' : 'text-sky-100 hover:bg-white/10 hover:text-white'"
                 >
-                  <ion-icon :icon="getIcon(menu.icon)" class="text-base shrink-0 group-hover:scale-105 transition-transform"></ion-icon>
+                  <ion-icon :icon="getIcon(menu.icon)" class="text-base shrink-0 group-hover:scale-110 transition-transform"></ion-icon>
                   <span class="truncate">{{ menu.title }}</span>
                 </router-link>
               </div>
             </div>
 
             <!-- Tombol Keluar di Sidebar -->
-            <div class="pt-2 border-t border-slate-800">
+            <div class="pt-3 border-t border-white/10">
               <button
                 @click="handleLogout"
-                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-300 hover:bg-rose-500/20 hover:text-white transition-colors border border-rose-500/20"
               >
                 <ion-icon :icon="logOutOutline" class="text-base shrink-0"></ion-icon>
                 <span>Keluar Akun</span>
