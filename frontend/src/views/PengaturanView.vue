@@ -1,7 +1,7 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-padding bg-slate-50">
-      <div class="max-w-3xl mx-auto py-6">
+    <ion-content :fullscreen="true" class="ion-padding bg-slate-50 pt-14 md:pt-4">
+      <div class="max-w-3xl mx-auto py-2">
 
         <!-- Header Halaman -->
         <div class="mb-6">

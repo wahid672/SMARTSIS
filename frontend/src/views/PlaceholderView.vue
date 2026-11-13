@@ -1,7 +1,7 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-padding bg-slate-50">
-      <div class="max-w-2xl mx-auto py-12 text-center">
+    <ion-content :fullscreen="true" class="ion-padding bg-slate-50 pt-14 md:pt-4">
+      <div class="max-w-2xl mx-auto py-8 text-center">
         <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center text-3xl font-bold mb-4">
           <ion-icon :icon="sparklesOutline"></ion-icon>
         </div>

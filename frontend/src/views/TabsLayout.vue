@@ -3,9 +3,11 @@
     <ion-split-pane content-id="main-content" when="md">
       
       <!-- SIDEBAR UNTUK TABLET & DESKTOP (MD/LG SCREEN) -->
-      <ion-menu content-id="main-content" type="overlay">
-        <ion-content class="bg-white">
-          <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+      <ion-menu content-id="main-content" type="overlay" class="border-r border-slate-200/90 shadow-sm">
+        <ion-content class="bg-slate-900 text-slate-100">
+          
+          <!-- Header Sidebar dengan Brand Sekolah -->
+          <div class="p-5 border-b border-slate-800/80 flex items-center gap-3 bg-slate-950/40">
             <div class="w-10 h-10 flex items-center justify-center shrink-0">
               <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain" />
               <div v-else class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
@@ -13,21 +15,21 @@
               </div>
             </div>
             <div class="min-w-0">
-              <h2 class="font-bold text-slate-800 text-sm leading-tight truncate">{{ settingsStore.app_name }}</h2>
+              <h2 class="font-bold text-white text-sm leading-tight truncate tracking-wide">{{ settingsStore.app_name }}</h2>
               <p class="text-[10px] text-slate-400 truncate">{{ settingsStore.school_name }}</p>
-              <span class="inline-block text-[10px] text-brand-600 font-semibold mt-0.5">{{ authStore.roleLabel }}</span>
+              <span class="inline-block text-[10px] text-emerald-400 font-semibold mt-0.5">{{ authStore.roleLabel }}</span>
             </div>
           </div>
 
           <!-- Switcher Siswa di Sidebar untuk Akun Wali -->
-          <div v-if="authStore.isWali && authStore.daftarSiswa.length > 0" class="p-4 mx-4 mt-4 bg-emerald-50 rounded-xl border border-emerald-100">
-            <label class="text-[10px] font-semibold text-emerald-800 uppercase tracking-wider block mb-1">
-              Data Siswa Aktif:
+          <div v-if="authStore.isWali && authStore.daftarSiswa.length > 0" class="p-3.5 mx-3 mt-3 bg-slate-800/80 rounded-xl border border-slate-700/60">
+            <label class="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider block mb-1">
+              Santri / Siswa Aktif:
             </label>
             <select
               :value="authStore.activeSiswa?.id"
               @change="onSwitchSiswa($event)"
-              class="w-full text-xs font-medium text-slate-800 bg-white border border-emerald-200 rounded-lg p-2 focus:outline-none"
+              class="w-full text-xs font-medium text-slate-200 bg-slate-900 border border-slate-700 rounded-lg p-2 focus:outline-none"
             >
               <option v-for="s in authStore.daftarSiswa" :key="s.id" :value="s.id">
                 {{ s.nama_lengkap }} ({{ s.kelas }})
@@ -35,24 +37,38 @@
             </select>
           </div>
 
-          <!-- Daftar Menu Dinamis di Sidebar -->
-          <ion-list lines="none" class="px-3 py-4 space-y-1">
-            <ion-item
-              v-for="menu in authStore.menus"
-              :key="menu.code"
-              :router-link="menu.path"
-              router-direction="root"
-              class="rounded-xl text-slate-700 hover:text-brand-600 cursor-pointer font-medium text-xs"
-            >
-              <ion-icon slot="start" :icon="getIcon(menu.icon)" class="text-lg text-slate-500"></ion-icon>
-              <ion-label>{{ menu.title }}</ion-label>
-            </ion-item>
+          <!-- Daftar Menu Berkelompok (Sub-kategori ala AdminLTE / Modern Dashboard) -->
+          <div class="px-3 py-4 space-y-4">
+            <div v-for="(group, catName) in groupedMenus" :key="catName">
+              <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-1">
+                {{ catName }}
+              </h3>
+              <div class="space-y-1">
+                <router-link
+                  v-for="menu in group"
+                  :key="menu.code"
+                  :to="menu.path"
+                  class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all group"
+                  :class="route.path === menu.path ? 'bg-brand-500 text-white shadow-sm' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+                >
+                  <ion-icon :icon="getIcon(menu.icon)" class="text-base shrink-0 group-hover:scale-105 transition-transform"></ion-icon>
+                  <span class="truncate">{{ menu.title }}</span>
+                </router-link>
+              </div>
+            </div>
 
-            <ion-item @click="handleLogout" class="rounded-xl text-rose-600 cursor-pointer font-medium text-xs pt-4">
-              <ion-icon slot="start" :icon="logOutOutline" class="text-lg text-rose-500"></ion-icon>
-              <ion-label>Keluar Akun</ion-label>
-            </ion-item>
-          </ion-list>
+            <!-- Tombol Keluar di Sidebar -->
+            <div class="pt-2 border-t border-slate-800">
+              <button
+                @click="handleLogout"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"
+              >
+                <ion-icon :icon="logOutOutline" class="text-base shrink-0"></ion-icon>
+                <span>Keluar Akun</span>
+              </button>
+            </div>
+          </div>
+
         </ion-content>
       </ion-menu>
 
@@ -128,6 +144,19 @@ const isDashboard = computed(() => {
 // Judul halaman aktif untuk top bar mobile
 const currentTitle = computed(() => {
   return route.meta?.title || 'SMARTSIS'
+})
+
+// Mengelompokkan menu berdasarkan Kategori (Submenu/Grup Menu ala Admin Dashboard)
+const groupedMenus = computed(() => {
+  const groups = {}
+  authStore.menus.forEach(m => {
+    const cat = m.category || 'MENU LAINNYA'
+    if (!groups[cat]) {
+      groups[cat] = []
+    }
+    groups[cat].push(m)
+  })
+  return groups
 })
 
 // Mapping icon string ke Ionicons

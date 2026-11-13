@@ -23,6 +23,7 @@ func MigrateSchema() {
 			icon TEXT NOT NULL,
 			path TEXT NOT NULL,
 			parent_id INTEGER DEFAULT 0,
+			category TEXT DEFAULT '',
 			sort_order INTEGER DEFAULT 0,
 			is_active INTEGER DEFAULT 1
 		);`,
@@ -102,25 +103,30 @@ func SeedInitialData() {
 		DB.Exec(`INSERT OR IGNORE INTO roles (name, label, description) VALUES (?, ?, ?)`, r.name, r.label, r.desc)
 	}
 
-	// 2. Menus Default
+	// 2. Menus Default Berkelompok (Menu Utama, Akademik, Master Data, Pengaturan)
 	menus := []struct {
-		code, title, icon, path string
-		sort                    int
+		code, title, icon, path, category string
+		sort                              int
 	}{
-		{"dashboard", "Beranda", "home-outline", "/tabs/dashboard", 1},
-		{"presensi", "Presensi & Absensi", "calendar-outline", "/tabs/presensi", 2},
-		{"nilai", "Nilai & Rapor", "ribbon-outline", "/tabs/nilai", 3},
-		{"spp", "Keuangan / SPP", "wallet-outline", "/tabs/spp", 4},
-		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", 5},
-		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", 6},
-		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", 7},
-		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", 8},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", 9},
+		{"dashboard", "Beranda", "home-outline", "/tabs/dashboard", "UTAMA", 1},
+		{"presensi", "Presensi & Absensi", "calendar-outline", "/tabs/presensi", "AKADEMIK", 2},
+		{"nilai", "Nilai & Rapor", "ribbon-outline", "/tabs/nilai", "AKADEMIK", 3},
+		{"spp", "Keuangan / SPP", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
+		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 5},
+		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 6},
+		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 7},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 8},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 9},
 	}
 
+	// Pastikan kolom category ada jika tabel sudah ada sebelumnya
+	DB.Exec(`ALTER TABLE menus ADD COLUMN category TEXT DEFAULT ''`)
+
 	for _, m := range menus {
-		DB.Exec(`INSERT OR IGNORE INTO menus (code, title, icon, path, sort_order) VALUES (?, ?, ?, ?, ?)`,
-			m.code, m.title, m.icon, m.path, m.sort)
+		DB.Exec(`INSERT INTO menus (code, title, icon, path, category, sort_order) 
+			VALUES (?, ?, ?, ?, ?, ?)
+			ON CONFLICT(code) DO UPDATE SET title = excluded.title, icon = excluded.icon, path = excluded.path, category = excluded.category, sort_order = excluded.sort_order`,
+			m.code, m.title, m.icon, m.path, m.category, m.sort)
 	}
 
 	// 3. Hak Akses Menu Role Admin (Bisa semua menu)

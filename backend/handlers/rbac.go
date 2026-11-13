@@ -101,7 +101,7 @@ func GetRolePermissions(c *gin.Context) {
 	roleID, _ := strconv.Atoi(idStr)
 
 	query := `
-		SELECT m.id, m.code, m.title, m.icon, m.path, m.sort_order,
+		SELECT m.id, m.code, m.title, m.icon, m.path, COALESCE(m.category, 'LAINNYA'), m.sort_order,
 		       COALESCE(rm.can_view, 0) as can_view,
 		       COALESCE(rm.can_create, 0) as can_create,
 		       COALESCE(rm.can_edit, 0) as can_edit,
@@ -123,7 +123,7 @@ func GetRolePermissions(c *gin.Context) {
 	for rows.Next() {
 		var item models.MenuPermission
 		var canView, canCreate, canEdit, canDelete int
-		if err := rows.Scan(&item.MenuID, &item.Code, &item.Title, &item.Icon, &item.Path, &item.SortOrder,
+		if err := rows.Scan(&item.MenuID, &item.Code, &item.Title, &item.Icon, &item.Path, &item.Category, &item.SortOrder,
 			&canView, &canCreate, &canEdit, &canDelete); err == nil {
 			item.CanView = canView == 1
 			item.CanCreate = canCreate == 1

@@ -8,6 +8,7 @@ import ProfilView from '@/views/ProfilView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
 import PengaturanView from '@/views/PengaturanView.vue'
 import RolesView from '@/views/RolesView.vue'
+import PegawaiView from '@/views/PegawaiView.vue'
 
 const routes = [
   {
@@ -73,7 +74,7 @@ const routes = [
       {
         path: 'pegawai',
         name: 'AdminPegawai',
-        component: PlaceholderView,
+        component: PegawaiView,
         meta: { title: 'Manajemen Pegawai & Guru' }
       },
       {

@@ -50,6 +50,12 @@ func main() {
 			protected.GET("/admin/roles/:id/permissions", handlers.GetRolePermissions)
 			protected.POST("/admin/roles/:id/permissions", handlers.UpdateRolePermissions)
 
+			// Pegawai Management
+			protected.GET("/admin/pegawai", handlers.GetAllPegawai)
+			protected.POST("/admin/pegawai", handlers.CreatePegawai)
+			protected.PUT("/admin/pegawai/:id", handlers.UpdatePegawai)
+			protected.DELETE("/admin/pegawai/:id", handlers.DeletePegawai)
+
 			// Update Settings (Hanya bisa diakses setelah login)
 			protected.POST("/settings", handlers.UpdateSettings)
 

@@ -114,7 +114,7 @@ func Login(c *gin.Context) {
 
 func GetMenusByRole(roleID int) ([]models.MenuPermission, error) {
 	query := `
-		SELECT m.id, m.code, m.title, m.icon, m.path, m.sort_order,
+		SELECT m.id, m.code, m.title, m.icon, m.path, COALESCE(m.category, 'LAINNYA'), m.sort_order,
 		       rm.can_view, rm.can_create, rm.can_edit, rm.can_delete
 		FROM menus m
 		JOIN role_menus rm ON rm.menu_id = m.id
@@ -131,7 +131,7 @@ func GetMenusByRole(roleID int) ([]models.MenuPermission, error) {
 	for rows.Next() {
 		var item models.MenuPermission
 		var canView, canCreate, canEdit, canDelete int
-		if err := rows.Scan(&item.MenuID, &item.Code, &item.Title, &item.Icon, &item.Path, &item.SortOrder,
+		if err := rows.Scan(&item.MenuID, &item.Code, &item.Title, &item.Icon, &item.Path, &item.Category, &item.SortOrder,
 			&canView, &canCreate, &canEdit, &canDelete); err == nil {
 			item.CanView = canView == 1
 			item.CanCreate = canCreate == 1

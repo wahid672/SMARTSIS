@@ -13,6 +13,7 @@ type MenuPermission struct {
 	Title     string `json:"title"`
 	Icon      string `json:"icon"`
 	Path      string `json:"path"`
+	Category  string `json:"category"`
 	SortOrder int    `json:"sort_order"`
 	CanView   bool   `json:"can_view"`
 	CanCreate bool   `json:"can_create"`

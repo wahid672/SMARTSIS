@@ -24,3 +24,9 @@
   --ion-color-primary-shade: #059669;
   --ion-color-primary-tint: #34d399;
 }
+
+/* Sidebar Styling ala Admin Template Modern */
+ion-split-pane {
+  --side-width: 260px;
+  --side-max-width: 280px;
+}

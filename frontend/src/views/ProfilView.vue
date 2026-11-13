@@ -1,7 +1,7 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-padding bg-slate-50">
-      <div class="max-w-2xl mx-auto py-6">
+    <ion-content :fullscreen="true" class="ion-padding bg-slate-50 pt-14 md:pt-4">
+      <div class="max-w-2xl mx-auto py-2">
         <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-center">
           
           <div class="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mx-auto flex items-center justify-center text-3xl font-bold mb-4">

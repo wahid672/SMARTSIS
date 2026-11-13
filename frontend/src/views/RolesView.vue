@@ -1,7 +1,7 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-padding bg-slate-50">
-      <div class="max-w-4xl mx-auto py-6">
+    <ion-content :fullscreen="true" class="ion-padding bg-slate-50 pt-14 md:pt-4">
+      <div class="max-w-4xl mx-auto py-2">
 
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
