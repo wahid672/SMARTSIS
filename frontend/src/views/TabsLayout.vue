@@ -59,7 +59,19 @@
       <!-- KONTEN UTAMA & BOTTOM TABS (UNTUK SMARTPHONE) -->
       <div id="main-content" class="ion-page">
 
-        <!-- Ionic Tabs Shell (Header mobile dihilangkan, ruang layar penuh untuk konten) -->
+        <!-- Mobile Top App Bar (Hanya tampil di smartphone dan BUKAN di Beranda) -->
+        <ion-header v-if="!isDashboard" class="ion-no-border shadow-sm bg-white md:hidden">
+          <ion-toolbar class="bg-white px-2">
+            <ion-buttons slot="start">
+              <ion-back-button default-href="/tabs/dashboard" text="" color="dark"></ion-back-button>
+            </ion-buttons>
+            <ion-title class="text-sm font-bold text-slate-800">
+              {{ currentTitle }}
+            </ion-title>
+          </ion-toolbar>
+        </ion-header>
+
+        <!-- Ionic Tabs Shell -->
         <ion-tabs>
           <ion-router-outlet></ion-router-outlet>
 
@@ -90,11 +102,11 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import {
   IonPage, IonSplitPane, IonMenu, IonContent, IonHeader, IonToolbar, IonTitle,
   IonList, IonItem, IonIcon, IonLabel, IonTabs, IonTabBar, IonTabButton, IonRouterOutlet,
-  IonButtons, IonMenuButton
+  IonButtons, IonMenuButton, IonBackButton
 } from '@ionic/vue'
 import {
   homeOutline, calendarOutline, ribbonOutline, walletOutline,
@@ -106,6 +118,17 @@ import { useSettingsStore } from '@/stores/settings'
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
 const router = useRouter()
+const route = useRoute()
+
+// Cek apakah halaman saat ini adalah Beranda
+const isDashboard = computed(() => {
+  return route.path === '/tabs/dashboard' || route.path === '/tabs/' || route.path === '/'
+})
+
+// Judul halaman aktif untuk top bar mobile
+const currentTitle = computed(() => {
+  return route.meta?.title || 'SMARTSIS'
+})
 
 // Mapping icon string ke Ionicons
 const iconMap = {
