@@ -638,7 +638,8 @@ func GetAllTagihan(c *gin.Context) {
 		SELECT ts.id, ts.siswa_id, s.nama_lengkap, s.nis, s.kelas,
 		       pt.id as pos_tagihan_id, pt.nama_tagihan, COALESCE(pt.tipe_bayar, 'bulanan'),
 		       ta.nama_tahun, ta.semester,
-		       COALESCE(ts.bulan, ts.periode), ts.nominal, ts.terbayar, ts.status, COALESCE(ts.tanggal_bayar, '')
+		       CASE WHEN ts.bulan != '' AND ts.bulan IS NOT NULL THEN ts.bulan ELSE ts.periode END,
+		       ts.nominal, ts.terbayar, ts.status, COALESCE(ts.tanggal_bayar, '')
 		FROM tagihan_siswa ts
 		JOIN siswa s ON s.id = ts.siswa_id
 		JOIN pos_tagihan pt ON pt.id = ts.pos_tagihan_id
@@ -781,4 +782,24 @@ func BayarTagihan(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Pembayaran tagihan berhasil diproses & dicatat di Buku Kas Masuk"})
+}
+
+// DeleteTagihan - Menghapus data baris tagihan siswa
+func DeleteTagihan(c *gin.Context) {
+	idStr := c.Param("id")
+	tagihanID, _ := strconv.Atoi(idStr)
+
+	res, err := database.DB.Exec(`DELETE FROM tagihan_siswa WHERE id = ?`, tagihanID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus tagihan: " + err.Error()})
+		return
+	}
+
+	affected, _ := res.RowsAffected()
+	if affected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Data tagihan tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data tagihan siswa berhasil dihapus"})
 }

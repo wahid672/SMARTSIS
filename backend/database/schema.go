@@ -195,6 +195,9 @@ func MigrateSchema() {
 	DB.Exec(`ALTER TABLE pos_tagihan ADD COLUMN tipe_bayar TEXT DEFAULT 'bulanan'`)
 	DB.Exec(`ALTER TABLE tagihan_siswa ADD COLUMN bulan TEXT DEFAULT ''`)
 
+	DB.Exec(`UPDATE pos_tagihan SET nama_tagihan = REPLACE(nama_tagihan, 'Santri', 'Siswa') WHERE nama_tagihan LIKE '%Santri%'`)
+	DB.Exec(`UPDATE tagihan_siswa SET bulan = periode WHERE bulan = '' OR bulan IS NULL`)
+
 	log.Println("Migrasi tabel SQLite berhasil dijalankan.")
 }
 

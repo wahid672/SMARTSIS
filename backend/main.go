@@ -106,6 +106,7 @@ func main() {
 			// Transaksi Tagihan & Kasir Siswa
 			protected.GET("/keuangan/tagihan", handlers.GetAllTagihan)
 			protected.POST("/keuangan/tagihan/:id/bayar", handlers.BayarTagihan)
+			protected.DELETE("/keuangan/tagihan/:id", handlers.DeleteTagihan)
 
 			// Modul Presensi & Absensi Siswa
 			protected.GET("/presensi/kelas", handlers.GetPresensiByKelasDanTanggal)

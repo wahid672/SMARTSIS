@@ -413,16 +413,25 @@
                         </span>
                       </td>
                       <td class="py-3 px-4 text-right">
-                        <button
-                          v-if="t.status === 'belum_lunas'"
-                          @click="handleBayarKasir(t)"
-                          class="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-sm transition-all"
-                        >
-                          Terima Bayar
-                        </button>
-                        <span v-else class="text-[10px] text-slate-400 font-mono">
-                          {{ t.tanggal_bayar.slice(0, 10) }}
-                        </span>
+                        <div class="inline-flex items-center gap-2 justify-end">
+                          <button
+                            v-if="t.status === 'belum_lunas'"
+                            @click="handleBayarKasir(t)"
+                            class="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-sm transition-all"
+                          >
+                            Terima Bayar
+                          </button>
+                          <span v-else class="text-[10px] text-slate-400 font-mono">
+                            {{ t.tanggal_bayar.slice(0, 10) }}
+                          </span>
+                          <button
+                            @click="handleDeleteTagihan(t)"
+                            class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                            title="Hapus Data Tagihan"
+                          >
+                            <ion-icon :icon="trashOutline" class="text-base"></ion-icon>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     <tr v-if="filteredAdminTagihan.length === 0">
@@ -953,6 +962,19 @@ const handleBayarKasir = async (t) => {
     await fetchAllAdminTagihan()
   } catch (err) {
     errorMsg.value = err.response?.data?.error || 'Gagal memproses pembayaran kasir'
+  } finally {
+    setTimeout(() => { successMsg.value = '' }, 4000)
+  }
+}
+
+const handleDeleteTagihan = async (t) => {
+  if (!confirm(`Hapus data tagihan ${t.nama_tagihan} (${t.periode}) an. ${t.nama_siswa}?`)) return
+  try {
+    await axios.delete(`/api/keuangan/tagihan/${t.id}`)
+    successMsg.value = `Data tagihan an. ${t.nama_siswa} berhasil dihapus!`
+    await fetchAllAdminTagihan()
+  } catch (err) {
+    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan'
   } finally {
     setTimeout(() => { successMsg.value = '' }, 4000)
   }
