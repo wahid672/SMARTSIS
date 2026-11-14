@@ -84,13 +84,6 @@
             </button>
           </form>
 
-          <!-- Hint akun demo untuk kemudahan pengujian -->
-          <div class="mt-6 pt-5 border-t border-slate-100 text-[11px] text-slate-400 space-y-1">
-            <p class="font-medium text-slate-600">Demo Akun Cepat:</p>
-            <p>• Pegawai/Admin: <code class="text-slate-600 bg-slate-100 px-1 py-0.5 rounded">admin@sekolah.sch.id</code> / <code class="text-slate-600 bg-slate-100 px-1 py-0.5 rounded">admin123</code></p>
-            <p>• Wali Siswa: <code class="text-slate-600 bg-slate-100 px-1 py-0.5 rounded">081234567890</code> / <code class="text-slate-600 bg-slate-100 px-1 py-0.5 rounded">123456</code></p>
-          </div>
-
         </div>
 
         <!-- Tagline sebagai Footer di Bagian Bawah Halaman -->
