@@ -292,6 +292,7 @@ import {
   personAddOutline, createOutline, trashOutline, searchOutline, logoWhatsapp,
   checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const siswaList = ref([])
 const kelasList = ref([])
@@ -402,14 +403,26 @@ const handleSubmit = async () => {
 }
 
 const handleDelete = async (s) => {
-  if (!confirm(`Hapus data siswa "${s.nama_lengkap}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Data Siswa?',
+    text: `Yakin ingin menghapus data siswa <b>"${s.nama_lengkap}"</b> (NIS: ${s.nis || '-'})?<br/><br/><span class="text-xs text-rose-600 font-semibold">Tindakan ini tidak dapat dibatalkan.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Siswa',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/siswa/${s.id}`)
-    successMsg.value = 'Data siswa berhasil dihapus'
+    showToast('Data siswa berhasil dihapus', 'success')
     await fetchSiswa()
-    setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus siswa'
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus siswa',
+      icon: 'error'
+    })
   }
 }
 

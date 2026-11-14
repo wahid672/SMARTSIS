@@ -217,6 +217,7 @@ import {
   checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
 import axios from 'axios'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const mapelList = ref([])
 const isLoading = ref(false)
@@ -315,20 +316,26 @@ const handleSubmit = async () => {
 }
 
 const handleDelete = async (item) => {
-  if (!confirm(`Hapus mata pelajaran "${item.nama_mapel}"?`)) return
-  successMsg.value = ''
-  errorMsg.value = ''
+  const confirmed = await showConfirm({
+    title: 'Hapus Mata Pelajaran?',
+    text: `Yakin ingin menghapus mata pelajaran <b>"${item.nama_mapel}"</b>?`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Mapel',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/mapel/${item.id}`)
-    successMsg.value = 'Mata pelajaran berhasil dihapus'
+    showToast('Mata pelajaran berhasil dihapus', 'success')
     await fetchMapel()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus mata pelajaran'
-  } finally {
-    setTimeout(() => {
-      successMsg.value = ''
-      errorMsg.value = ''
-    }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus mata pelajaran',
+      icon: 'error'
+    })
   }
 }
 

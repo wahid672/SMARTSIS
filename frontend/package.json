@@ -11,11 +11,12 @@
   "dependencies": {
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "axios": "^1.7.0",
     "ionicons": "^7.4.0",
-    "vue": "^3.5.0",
-    "vue-router": "^4.4.0",
     "pinia": "^2.2.0",
-    "axios": "^1.7.0"
+    "sweetalert2": "^11.26.25",
+    "vue": "^3.5.0",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.0",

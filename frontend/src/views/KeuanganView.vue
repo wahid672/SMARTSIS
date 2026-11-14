@@ -421,6 +421,7 @@ import {
   addOutline, folderOpenOutline, createOutline, trashOutline,
   checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const summary = ref({ total_masuk: 0, total_keluar: 0, saldo_kas: 0 })
 const kasList = ref([])
@@ -571,17 +572,26 @@ const handleSubmitPos = async () => {
 }
 
 const handleDeletePos = async (p) => {
-  if (!confirm(`Hapus pos keuangan "${p.nama_pos}"?`)) return
-  successMsg.value = ''
-  errorMsg.value = ''
+  const confirmed = await showConfirm({
+    title: 'Hapus Pos Keuangan?',
+    text: `Yakin ingin menghapus pos anggaran <b>"${p.nama_pos}"</b>?<br/><br/><span class="text-xs text-slate-500">Pos yang memiliki riwayat transaksi buku kas tidak dapat dihapus.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Pos',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/keuangan/pos/${p.id}`)
-    successMsg.value = 'Pos keuangan berhasil dihapus'
+    showToast('Pos keuangan berhasil dihapus', 'success')
     await fetchPos()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus pos keuangan'
-  } finally {
-    setTimeout(() => { successMsg.value = ''; errorMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus Pos',
+      text: err.response?.data?.error || 'Gagal menghapus pos keuangan',
+      icon: 'error'
+    })
   }
 }
 

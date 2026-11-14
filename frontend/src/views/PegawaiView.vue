@@ -216,6 +216,7 @@ import {
   checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
 import { useAuthStore } from '@/stores/auth'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const authStore = useAuthStore()
 
@@ -312,16 +313,28 @@ const handleSubmit = async () => {
 }
 
 const handleDelete = async (p) => {
-  if (!confirm(`Yakin ingin menghapus akun "${p.name}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Akun Pegawai?',
+    text: `Yakin ingin menghapus akun pegawai <b>"${p.name}"</b> (${p.email})?`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Akun',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/pegawai/${p.id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
-    successMsg.value = 'Akun pegawai berhasil dihapus'
+    showToast('Akun pegawai berhasil dihapus', 'success')
     await fetchPegawai()
-    setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus pegawai'
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus pegawai',
+      icon: 'error'
+    })
   }
 }
 

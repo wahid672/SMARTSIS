@@ -700,6 +700,7 @@ import {
   createOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
 import { useAuthStore } from '@/stores/auth'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const authStore = useAuthStore()
 
@@ -905,11 +906,24 @@ const handleSubmitTarifKelas = async () => {
 const handleHapusSemuaTarif = async () => {
   const adaTagihan = tarifStudents.value.some(s => s.total_tagihan > 0)
   if (!adaTagihan) {
-    alert(`Belum ada tagihan yang diset pada kelas ${selectedTarifKelas.value} untuk pos ${currentPosTagihan.value.nama_tagihan}.`)
+    await showAlert({
+      title: 'Belum Ada Tagihan',
+      text: `Belum ada tagihan yang diset pada kelas <b>${selectedTarifKelas.value}</b> untuk pos <b>${currentPosTagihan.value.nama_tagihan}</b>.`,
+      icon: 'info'
+    })
     return
   }
 
-  if (!confirm(`Hapus semua tagihan untuk kelas ${selectedTarifKelas.value} pada ${currentPosTagihan.value.nama_tagihan}?\n\nCatatan: Seluruh riwayat mutasi kas terkait juga akan dibatalkan/dihapus agar saldo kas tetap sinkron.`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Semua Tagihan Kelas?',
+    text: `Yakin ingin menghapus seluruh tagihan untuk kelas <b>${selectedTarifKelas.value}</b> pada pos <b>${currentPosTagihan.value.nama_tagihan}</b>?<br/><br/><span class="text-rose-600 font-semibold text-xs">⚠️ Catatan: Riwayat mutasi kas terkait juga akan dibatalkan/dihapus agar saldo kas sinkron.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Semua',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     const res = await axios.delete('/api/keuangan/tagihan/tarif/kelas', {
       params: {
@@ -917,17 +931,28 @@ const handleHapusSemuaTarif = async () => {
         kelas: selectedTarifKelas.value
       }
     })
-    successMsg.value = res.data.message || 'Tagihan kelas berhasil dihapus'
+    showToast(res.data.message || 'Tagihan kelas berhasil dihapus', 'success')
     await loadTarifKelas()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan kelas'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus tagihan kelas',
+      icon: 'error'
+    })
   }
 }
 
 const handleHapusTarifSiswa = async (s) => {
-  if (!confirm(`Hapus semua data tagihan ${currentPosTagihan.value.nama_tagihan} untuk siswa "${s.nama_lengkap}" (${s.kelas})?\n\nJika ada tagihan yang sudah dibayar, mutasi kas masuk terkait juga akan otomatis dibatalkan/dihapus.`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Tagihan Siswa?',
+    text: `Hapus seluruh data tagihan <b>${currentPosTagihan.value.nama_tagihan}</b> untuk siswa <b>${s.nama_lengkap}</b> (${s.kelas})?<br/><br/><span class="text-rose-600 font-semibold text-xs">⚠️ Jika ada tagihan yang sudah dibayar, mutasi kas masuk terkait akan otomatis dibatalkan/dihapus.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Tagihan',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     const res = await axios.delete('/api/keuangan/tagihan/tarif/siswa', {
       params: {
@@ -935,12 +960,14 @@ const handleHapusTarifSiswa = async (s) => {
         siswa_id: s.siswa_id
       }
     })
-    successMsg.value = res.data.message || `Tagihan an. ${s.nama_lengkap} berhasil dihapus`
+    showToast(res.data.message || `Tagihan an. ${s.nama_lengkap} berhasil dihapus`, 'success')
     await loadTarifKelas()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan siswa'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus tagihan siswa',
+      icon: 'error'
+    })
   }
 }
 
@@ -970,56 +997,91 @@ const handleSubmitJenis = async () => {
   try {
     if (isEditJenis.value) {
       await axios.put(`/api/keuangan/pos-tagihan/${editJenisId.value}`, formJenis.value)
-      successMsg.value = 'Jenis tagihan pembayaran berhasil diperbarui'
+      showToast('Jenis tagihan berhasil diperbarui', 'success')
     } else {
       await axios.post('/api/keuangan/pos-tagihan', formJenis.value)
-      successMsg.value = 'Jenis tagihan pembayaran baru berhasil disimpan'
+      showToast('Jenis tagihan baru berhasil disimpan', 'success')
     }
     showModalJenis.value = false
     await fetchPosTagihan()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menyimpan jenis tagihan'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menyimpan',
+      text: err.response?.data?.error || 'Gagal menyimpan jenis tagihan',
+      icon: 'error'
+    })
   }
 }
 
 const handleDeleteJenis = async (item) => {
-  if (!confirm(`Hapus jenis tagihan "${item.nama_tagihan}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Jenis Tagihan?',
+    text: `Apakah Anda yakin ingin menghapus pos tagihan <b>"${item.nama_tagihan}"</b>?`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/keuangan/pos-tagihan/${item.id}`)
-    successMsg.value = 'Jenis tagihan berhasil dihapus'
+    showToast('Jenis tagihan berhasil dihapus', 'success')
     await fetchPosTagihan()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus jenis tagihan'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus jenis tagihan',
+      icon: 'error'
+    })
   }
 }
 
 const handleBayarKasir = async (t) => {
-  if (!confirm(`Terima pembayaran ${t.nama_tagihan} (${t.periode}) an. ${t.nama_siswa} sebesar Rp ${formatRupiah(t.nominal)}?`)) return
+  const confirmed = await showConfirm({
+    title: 'Konfirmasi Pembayaran Kasir',
+    text: `Terima pembayaran <b>${t.nama_tagihan}</b> (${t.periode})<br/>an. <b>${t.nama_siswa}</b> (${t.kelas})<br/><br/><span class="text-xl font-black text-emerald-600 font-mono">Rp ${formatRupiah(t.nominal)}</span>`,
+    icon: 'question',
+    confirmButtonText: 'Terima Pembayaran',
+    cancelButtonText: 'Batal',
+    isDanger: false
+  })
+  if (!confirmed) return
+
   try {
     await axios.post(`/api/keuangan/tagihan/${t.id}/bayar`)
-    successMsg.value = `Pembayaran an. ${t.nama_siswa} berhasil diproses!`
+    showToast(`Pembayaran an. ${t.nama_siswa} berhasil diproses!`, 'success')
     await fetchAllAdminTagihan()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal memproses pembayaran kasir'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Memproses Pembayaran',
+      text: err.response?.data?.error || 'Gagal memproses pembayaran kasir',
+      icon: 'error'
+    })
   }
 }
 
 const handleDeleteTagihan = async (t) => {
-  if (!confirm(`Hapus data tagihan ${t.nama_tagihan} (${t.periode}) an. ${t.nama_siswa}?\n\nCatatan: Jika tagihan ini telah lunas/dibayar, riwayat mutasi kas masuk di Buku Kas Umum juga akan otomatis dibatalkan/dihapus agar saldo kas tetap sinkron.`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Data Tagihan?',
+    text: `Hapus tagihan <b>${t.nama_tagihan}</b> (${t.periode}) an. <b>${t.nama_siswa}</b>?<br/><br/><span class="text-rose-600 font-semibold text-xs">⚠️ Catatan: Jika tagihan ini telah lunas/dibayar, riwayat mutasi kas masuk di Buku Kas Umum juga akan otomatis dibatalkan/dihapus agar saldo kas sinkron.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Tagihan',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/keuangan/tagihan/${t.id}`)
-    successMsg.value = `Data tagihan an. ${t.nama_siswa} dan mutasi kas terkait berhasil dihapus!`
+    showToast(`Data tagihan an. ${t.nama_siswa} berhasil dihapus!`, 'success')
     await fetchAllAdminTagihan()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan'
-  } finally {
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    showAlert({
+      title: 'Gagal Menghapus Tagihan',
+      text: err.response?.data?.error || 'Gagal menghapus tagihan',
+      icon: 'error'
+    })
   }
 }
 

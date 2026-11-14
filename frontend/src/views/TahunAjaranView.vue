@@ -164,6 +164,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { IonPage, IonContent, IonIcon } from '@ionic/vue'
 import { addOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const tahunList = ref([])
 const showModal = ref(false)
@@ -216,14 +217,26 @@ const handleActivate = async (t) => {
 }
 
 const handleDelete = async (t) => {
-  if (!confirm(`Hapus tahun ajaran "${t.nama_tahun}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Tahun Ajaran?',
+    text: `Yakin ingin menghapus tahun ajaran <b>"${t.nama_tahun}"</b>?`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/tahun-ajaran/${t.id}`)
-    successMsg.value = 'Tahun ajaran berhasil dihapus'
+    showToast('Tahun ajaran berhasil dihapus', 'success')
     await fetchTahun()
-    setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tahun ajaran'
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus tahun ajaran',
+      icon: 'error'
+    })
   }
 }
 

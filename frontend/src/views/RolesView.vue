@@ -233,6 +233,7 @@ import {
   checkmarkCircleOutline, alertCircleOutline, sparklesOutline
 } from 'ionicons/icons'
 import { useAuthStore } from '@/stores/auth'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const authStore = useAuthStore()
 
@@ -310,16 +311,29 @@ const handleAddRole = async () => {
 }
 
 const handleDeleteRole = async (r) => {
-  if (!confirm(`Yakin ingin menghapus role "${r.label}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Hak Akses Role?',
+    text: `Yakin ingin menghapus role <b>"${r.label}"</b>?<br/><br/><span class="text-xs text-rose-600 font-semibold">User yang memiliki role ini akan kehilangan izin aksesnya.</span>`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Role',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/roles/${r.id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
-    successMsg.value = 'Role berhasil dihapus'
+    showToast('Role berhasil dihapus', 'success')
     selectedRole.value = null
     await fetchRoles()
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus role'
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus role',
+      icon: 'error'
+    })
   }
 }
 

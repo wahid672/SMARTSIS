@@ -161,6 +161,7 @@ import {
   addOutline, createOutline, trashOutline,
   checkmarkCircleOutline, alertCircleOutline
 } from 'ionicons/icons'
+import { showConfirm, showAlert, showToast } from '@/utils/alert'
 
 const kelasList = ref([])
 const showModal = ref(false)
@@ -230,14 +231,26 @@ const handleSubmit = async () => {
 }
 
 const handleDelete = async (k) => {
-  if (!confirm(`Hapus kelas "${k.nama_kelas}"?`)) return
+  const confirmed = await showConfirm({
+    title: 'Hapus Kelas?',
+    text: `Yakin ingin menghapus kelas <b>"${k.nama_kelas}"</b> (${k.tingkat})?`,
+    icon: 'warning',
+    confirmButtonText: 'Ya, Hapus Kelas',
+    cancelButtonText: 'Batal',
+    isDanger: true
+  })
+  if (!confirmed) return
+
   try {
     await axios.delete(`/api/admin/kelas/${k.id}`)
-    successMsg.value = 'Kelas berhasil dihapus'
+    showToast('Kelas berhasil dihapus', 'success')
     await fetchKelas()
-    setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus kelas'
+    showAlert({
+      title: 'Gagal Menghapus',
+      text: err.response?.data?.error || 'Gagal menghapus kelas',
+      icon: 'error'
+    })
   }
 }
 
