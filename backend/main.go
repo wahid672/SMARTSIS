@@ -102,6 +102,7 @@ func main() {
 			protected.GET("/keuangan/tagihan/tarif", handlers.GetTarifKelas)
 			protected.POST("/keuangan/tagihan/tarif/kelas", handlers.SaveTarifKelasBatch)
 			protected.DELETE("/keuangan/tagihan/tarif/kelas", handlers.DeleteTarifKelas)
+			protected.DELETE("/keuangan/tagihan/tarif/siswa", handlers.DeleteTarifSiswa)
 
 			// Transaksi Tagihan & Kasir Siswa
 			protected.GET("/keuangan/tagihan", handlers.GetAllTagihan)

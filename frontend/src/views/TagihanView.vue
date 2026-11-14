@@ -298,7 +298,7 @@
                 Memuat data tagihan siswa kelas {{ selectedTarifKelas }}...
               </div>
               <div v-else class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-600 min-w-[700px]">
+                <table class="w-full text-left text-xs text-slate-600 min-w-[750px]">
                   <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
                     <tr>
                       <th class="py-3 px-4 w-12 text-center">No</th>
@@ -307,6 +307,7 @@
                       <th class="py-3 px-4">Kelas</th>
                       <th class="py-3 px-4">Total Tagihan</th>
                       <th class="py-3 px-4">Rincian Bulan / Periode</th>
+                      <th class="py-3 px-4 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
@@ -315,25 +316,43 @@
                       <td class="py-3 px-4 font-mono font-semibold">{{ s.nis }}</td>
                       <td class="py-3 px-4 font-bold text-slate-800">{{ s.nama_lengkap }}</td>
                       <td class="py-3 px-4 font-semibold text-slate-600">{{ s.kelas }}</td>
-                      <td class="py-3 px-4 font-mono font-black text-slate-800">
-                        Rp {{ formatRupiah(s.total_tagihan) }}
+                      <td class="py-3 px-4">
+                        <span v-if="s.total_tagihan > 0" class="font-mono font-black text-slate-800">
+                          Rp {{ formatRupiah(s.total_tagihan) }}
+                        </span>
+                        <span v-else class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-400">
+                          Belum Diset (Rp 0)
+                        </span>
                       </td>
                       <td class="py-3 px-4">
-                        <div class="flex flex-wrap gap-1 max-w-md">
+                        <div v-if="s.bulan_list && s.bulan_list.length > 0" class="flex flex-wrap gap-1 max-w-md">
                           <span
                             v-for="b in s.bulan_list"
                             :key="b.id"
                             class="px-2 py-0.5 rounded text-[10px] font-mono border"
-                            :class="b.status === 'lunas' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200'"
+                            :class="b.status === 'lunas' ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold' : 'bg-slate-50 text-slate-700 border-slate-200'"
                             :title="`${b.bulan}: Rp ${formatRupiah(b.nominal)} (${b.status})`"
                           >
                             {{ b.bulan.slice(0, 3) }}: {{ b.status === 'lunas' ? '✓' : formatRupiah(b.nominal) }}
                           </span>
                         </div>
+                        <span v-else class="text-slate-400 italic text-[11px]">- Belum ada tagihan -</span>
+                      </td>
+                      <td class="py-3 px-4 text-center">
+                        <button
+                          v-if="s.total_tagihan > 0"
+                          @click="handleHapusTarifSiswa(s)"
+                          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] border border-rose-200 transition-colors"
+                          title="Hapus seluruh tagihan siswa ini pada pos ini"
+                        >
+                          <ion-icon :icon="trashOutline" class="text-xs"></ion-icon>
+                          Hapus
+                        </button>
+                        <span v-else class="text-slate-300 text-xs">-</span>
                       </td>
                     </tr>
                     <tr v-if="tarifStudents.length === 0">
-                      <td colspan="6" class="p-8 text-center text-slate-400 text-xs">
+                      <td colspan="7" class="p-8 text-center text-slate-400 text-xs">
                         Tidak ada siswa di kelas {{ selectedTarifKelas }} atau tagihan belum diset. Klik "+ Berdasarkan Kelas" untuk mengisi tarif.
                       </td>
                     </tr>
@@ -884,7 +903,13 @@ const handleSubmitTarifKelas = async () => {
 }
 
 const handleHapusSemuaTarif = async () => {
-  if (!confirm(`Hapus semua tagihan yang belum lunas untuk kelas ${selectedTarifKelas.value} pada ${currentPosTagihan.value.nama_tagihan}?`)) return
+  const adaTagihan = tarifStudents.value.some(s => s.total_tagihan > 0)
+  if (!adaTagihan) {
+    alert(`Belum ada tagihan yang diset pada kelas ${selectedTarifKelas.value} untuk pos ${currentPosTagihan.value.nama_tagihan}.`)
+    return
+  }
+
+  if (!confirm(`Hapus semua tagihan untuk kelas ${selectedTarifKelas.value} pada ${currentPosTagihan.value.nama_tagihan}?\n\nCatatan: Seluruh riwayat mutasi kas terkait juga akan dibatalkan/dihapus agar saldo kas tetap sinkron.`)) return
   try {
     const res = await axios.delete('/api/keuangan/tagihan/tarif/kelas', {
       params: {
@@ -892,10 +917,28 @@ const handleHapusSemuaTarif = async () => {
         kelas: selectedTarifKelas.value
       }
     })
-    successMsg.value = res.data.message || 'Tagihan berhasil dihapus'
+    successMsg.value = res.data.message || 'Tagihan kelas berhasil dihapus'
     await loadTarifKelas()
   } catch (err) {
     errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan kelas'
+  } finally {
+    setTimeout(() => { successMsg.value = '' }, 4000)
+  }
+}
+
+const handleHapusTarifSiswa = async (s) => {
+  if (!confirm(`Hapus semua data tagihan ${currentPosTagihan.value.nama_tagihan} untuk siswa "${s.nama_lengkap}" (${s.kelas})?\n\nJika ada tagihan yang sudah dibayar, mutasi kas masuk terkait juga akan otomatis dibatalkan/dihapus.`)) return
+  try {
+    const res = await axios.delete('/api/keuangan/tagihan/tarif/siswa', {
+      params: {
+        pos_tagihan_id: currentPosTagihan.value.id,
+        siswa_id: s.siswa_id
+      }
+    })
+    successMsg.value = res.data.message || `Tagihan an. ${s.nama_lengkap} berhasil dihapus`
+    await loadTarifKelas()
+  } catch (err) {
+    errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan siswa'
   } finally {
     setTimeout(() => { successMsg.value = '' }, 4000)
   }
@@ -968,10 +1011,10 @@ const handleBayarKasir = async (t) => {
 }
 
 const handleDeleteTagihan = async (t) => {
-  if (!confirm(`Hapus data tagihan ${t.nama_tagihan} (${t.periode}) an. ${t.nama_siswa}?`)) return
+  if (!confirm(`Hapus data tagihan ${t.nama_tagihan} (${t.periode}) an. ${t.nama_siswa}?\n\nCatatan: Jika tagihan ini telah lunas/dibayar, riwayat mutasi kas masuk di Buku Kas Umum juga akan otomatis dibatalkan/dihapus agar saldo kas tetap sinkron.`)) return
   try {
     await axios.delete(`/api/keuangan/tagihan/${t.id}`)
-    successMsg.value = `Data tagihan an. ${t.nama_siswa} berhasil dihapus!`
+    successMsg.value = `Data tagihan an. ${t.nama_siswa} dan mutasi kas terkait berhasil dihapus!`
     await fetchAllAdminTagihan()
   } catch (err) {
     errorMsg.value = err.response?.data?.error || 'Gagal menghapus tagihan'

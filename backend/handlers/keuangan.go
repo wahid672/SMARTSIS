@@ -594,7 +594,7 @@ func SaveTarifKelasBatch(c *gin.Context) {
 	})
 }
 
-// DeleteTarifKelas - Menghapus tagihan yang belum lunas untuk satu kelas pada pos tertentu
+// DeleteTarifKelas - Menghapus tagihan untuk satu kelas pada pos tertentu beserta mutasi kasnya
 func DeleteTarifKelas(c *gin.Context) {
 	posTagihanID := c.Query("pos_tagihan_id")
 	kelas := c.Query("kelas")
@@ -604,9 +604,30 @@ func DeleteTarifKelas(c *gin.Context) {
 		return
 	}
 
-	res, err := database.DB.Exec(`
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memulai transaksi"})
+		return
+	}
+	defer tx.Rollback()
+
+	// 1. Hapus transaksi kas yang terkait dengan tagihan-tagihan di kelas ini
+	tx.Exec(`
+		DELETE FROM transaksi_kas
+		WHERE id IN (
+			SELECT t.id FROM transaksi_kas t
+			JOIN tagihan_siswa ts ON (
+				t.kode_transaksi LIKE 'BYR-' || ts.id || '-%' 
+				OR t.kode_transaksi LIKE 'SPP-' || ts.id || '-%'
+			)
+			WHERE ts.pos_tagihan_id = ? AND ts.siswa_id IN (SELECT id FROM siswa WHERE kelas = ?)
+		)
+	`, posTagihanID, kelas)
+
+	// 2. Hapus seluruh data tagihan siswa di kelas ini
+	res, err := tx.Exec(`
 		DELETE FROM tagihan_siswa
-		WHERE pos_tagihan_id = ? AND status != 'lunas' AND siswa_id IN (
+		WHERE pos_tagihan_id = ? AND siswa_id IN (
 			SELECT id FROM siswa WHERE kelas = ?
 		)
 	`, posTagihanID, kelas)
@@ -617,8 +638,68 @@ func DeleteTarifKelas(c *gin.Context) {
 	}
 
 	affected, _ := res.RowsAffected()
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan perubahan ke database"})
+		return
+	}
+
+	if affected == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf("Belum ada data tagihan yang tersimpan untuk kelas %s", kelas),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("Berhasil menghapus %d data tagihan yang belum lunas untuk kelas %s", affected, kelas),
+		"message": fmt.Sprintf("Berhasil menghapus %d data tagihan dan memperbarui mutasi buku kas untuk kelas %s", affected, kelas),
+	})
+}
+
+// DeleteTarifSiswa - Menghapus tagihan untuk satu siswa pada pos tertentu beserta mutasi kasnya
+func DeleteTarifSiswa(c *gin.Context) {
+	posTagihanID := c.Query("pos_tagihan_id")
+	siswaID := c.Query("siswa_id")
+
+	if posTagihanID == "" || siswaID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "pos_tagihan_id dan siswa_id wajib diisi"})
+		return
+	}
+
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memulai transaksi"})
+		return
+	}
+	defer tx.Rollback()
+
+	// 1. Hapus transaksi kas yang terkait tagihan siswa ini
+	tx.Exec(`
+		DELETE FROM transaksi_kas
+		WHERE id IN (
+			SELECT t.id FROM transaksi_kas t
+			JOIN tagihan_siswa ts ON (
+				t.kode_transaksi LIKE 'BYR-' || ts.id || '-%' 
+				OR t.kode_transaksi LIKE 'SPP-' || ts.id || '-%'
+			)
+			WHERE ts.pos_tagihan_id = ? AND ts.siswa_id = ?
+		)
+	`, posTagihanID, siswaID)
+
+	// 2. Hapus tagihan siswa ini
+	res, err := tx.Exec(`DELETE FROM tagihan_siswa WHERE pos_tagihan_id = ? AND siswa_id = ?`, posTagihanID, siswaID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus tagihan siswa: " + err.Error()})
+		return
+	}
+
+	affected, _ := res.RowsAffected()
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan perubahan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": fmt.Sprintf("Berhasil menghapus %d tagihan siswa dan mutasi kas terkait", affected),
 	})
 }
 
@@ -784,12 +865,39 @@ func BayarTagihan(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Pembayaran tagihan berhasil diproses & dicatat di Buku Kas Masuk"})
 }
 
-// DeleteTagihan - Menghapus data baris tagihan siswa
+// DeleteTagihan - Menghapus data baris tagihan siswa beserta mutasi kasnya jika ada
 func DeleteTagihan(c *gin.Context) {
 	idStr := c.Param("id")
 	tagihanID, _ := strconv.Atoi(idStr)
 
-	res, err := database.DB.Exec(`DELETE FROM tagihan_siswa WHERE id = ?`, tagihanID)
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memulai transaksi: " + err.Error()})
+		return
+	}
+	defer tx.Rollback()
+
+	// 1. Ambil data siswa & nominal untuk hapus transaksi kas terkait jika ada
+	var siswaID int
+	var nominal float64
+	var namaSiswa string
+	_ = tx.QueryRow(`
+		SELECT ts.siswa_id, ts.nominal, s.nama_lengkap
+		FROM tagihan_siswa ts
+		JOIN siswa s ON s.id = ts.siswa_id
+		WHERE ts.id = ?
+	`, tagihanID).Scan(&siswaID, &nominal, &namaSiswa)
+
+	// 2. Hapus catatan kas masuk yang terhubung dengan tagihan ini
+	tx.Exec(`
+		DELETE FROM transaksi_kas
+		WHERE kode_transaksi LIKE ? 
+		   OR kode_transaksi LIKE ?
+		   OR (keterangan LIKE ? AND nominal = ?)
+	`, fmt.Sprintf("BYR-%d-%%", tagihanID), fmt.Sprintf("SPP-%d-%%", tagihanID), "%"+namaSiswa+"%", nominal)
+
+	// 3. Hapus baris tagihan siswa
+	res, err := tx.Exec(`DELETE FROM tagihan_siswa WHERE id = ?`, tagihanID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus tagihan: " + err.Error()})
 		return
@@ -801,5 +909,10 @@ func DeleteTagihan(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Data tagihan siswa berhasil dihapus"})
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan perubahan ke database"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data tagihan siswa dan mutasi kas masuk terkait berhasil dihapus"})
 }
