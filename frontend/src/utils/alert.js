@@ -2,7 +2,10 @@ import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 
 // Custom instance dengan styling modern ala SMARTSIS (Tailwind-like classes)
+// `heightAuto: false` sangat krusial di SPA (Ionic / Vue / Tailwind) agar tidak memecah layout html/body
 const customSwal = Swal.mixin({
+  heightAuto: false,
+  buttonsStyling: false,
   customClass: {
     popup: 'rounded-3xl p-6 shadow-2xl border border-slate-100 font-sans',
     title: 'text-lg font-bold text-slate-800 tracking-tight',
@@ -10,8 +13,7 @@ const customSwal = Swal.mixin({
     confirmButton: 'px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md mx-1.5 transition-all outline-none',
     cancelButton: 'px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 mx-1.5 transition-all outline-none',
     actions: 'mt-6 gap-2'
-  },
-  buttonsStyling: false
+  }
 })
 
 /**
@@ -46,6 +48,7 @@ export const showConfirm = async ({
     cancelButtonText,
     reverseButtons: true,
     focusCancel: isDanger,
+    heightAuto: false,
     customClass: {
       popup: 'rounded-3xl p-6 shadow-2xl border border-slate-100',
       title: 'text-base sm:text-lg font-bold text-slate-800',
@@ -73,6 +76,7 @@ export const showAlert = async ({
     html: text.replace(/\n/g, '<br/>'),
     icon,
     confirmButtonText,
+    heightAuto: false,
     customClass: {
       popup: 'rounded-3xl p-6 shadow-2xl border border-slate-100',
       title: 'text-base sm:text-lg font-bold text-slate-800',
@@ -93,6 +97,7 @@ export const showToast = (title = 'Berhasil', icon = 'success') => {
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
+    heightAuto: false,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer
       toast.onmouseleave = Swal.resumeTimer
