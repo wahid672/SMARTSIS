@@ -132,7 +132,7 @@ import {
   IonButtons, IonMenuButton, IonBackButton
 } from '@ionic/vue'
 import {
-  homeOutline, calendarOutline, ribbonOutline, walletOutline,
+  homeOutline, calendarOutline, ribbonOutline, walletOutline, cashOutline,
   peopleOutline, briefcaseOutline, shieldCheckmarkOutline, personOutline, logOutOutline, settingsOutline,
   schoolOutline, calendarNumberOutline, bookOutline
 } from 'ionicons/icons'
@@ -180,7 +180,8 @@ const iconMap = {
   'person-outline': personOutline,
   'school-outline': schoolOutline,
   'calendar-number-outline': calendarNumberOutline,
-  'book-outline': bookOutline
+  'book-outline': bookOutline,
+  'cash-outline': cashOutline
 }
 
 const getIcon = (name) => iconMap[name] || homeOutline

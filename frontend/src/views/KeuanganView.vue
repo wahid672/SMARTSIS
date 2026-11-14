@@ -6,29 +6,40 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 class="text-xl font-bold text-slate-800">Manajemen Keuangan</h1>
+            <h1 class="text-xl font-bold text-slate-800">Buku Kas & Pos Keuangan</h1>
             <p class="text-xs text-slate-500 mt-1">
-              Buku kas umum (kas masuk/keluar), pos anggaran, dan penagihan SPP siswa.
+              Catat mutasi arus kas umum (masuk/keluar) serta pantau saldo per pos anggaran operasional lembaga.
             </p>
           </div>
 
-          <!-- Tab Navigasi Sub-Modul (Ringkasan, Kas Masuk/Keluar, Tagihan SPP) -->
-          <div class="inline-flex bg-white p-1 rounded-2xl border border-slate-200/80 shadow-sm self-start sm:self-auto">
+          <!-- Tombol Aksi Header -->
+          <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
             <button
-              @click="activeSubTab = 'tagihan'"
-              class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all"
-              :class="activeSubTab === 'tagihan' ? 'bg-amber-400 text-amber-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+              @click="openModalMasterPos"
+              class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all"
             >
-              Tagihan SPP
+              <ion-icon :icon="folderOpenOutline" class="text-base text-amber-500"></ion-icon>
+              Master Pos Keuangan
             </button>
+
             <button
-              @click="activeSubTab = 'kas'"
-              class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all"
-              :class="activeSubTab === 'kas' ? 'bg-amber-400 text-amber-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+              @click="openModalCatatKas"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all"
             >
-              Buku Kas Masuk / Keluar
+              <ion-icon :icon="addOutline" class="text-base"></ion-icon>
+              Catat Kas Masuk / Keluar
             </button>
           </div>
+        </div>
+
+        <!-- Alert Notifikasi -->
+        <div v-if="successMsg" class="mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+          <ion-icon :icon="checkmarkCircleOutline" class="text-lg shrink-0"></ion-icon>
+          <span>{{ successMsg }}</span>
+        </div>
+        <div v-if="errorMsg" class="mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+          <ion-icon :icon="alertCircleOutline" class="text-lg shrink-0"></ion-icon>
+          <span>{{ errorMsg }}</span>
         </div>
 
         <!-- 3 Kartu Ringkasan Cashflow Utama -->
@@ -46,7 +57,7 @@
             <p class="text-2xl font-black text-rose-700 mt-1">
               Rp {{ formatRupiah(summary.total_keluar) }}
             </p>
-            <span class="text-[10px] text-slate-400 mt-0.5 block">Gaji, operasional, & utilitas</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 block">Gaji, operasional, & sarana</span>
           </div>
 
           <div class="bg-gradient-to-br from-blue-50 to-sky-100/40 p-5 rounded-2xl border border-blue-200/60 shadow-sm">
@@ -58,133 +69,102 @@
           </div>
         </div>
 
-        <!-- Alert Notifikasi -->
-        <div v-if="successMsg" class="mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
-          <ion-icon :icon="checkmarkCircleOutline" class="text-lg shrink-0"></ion-icon>
-          <span>{{ successMsg }}</span>
-        </div>
-        <div v-if="errorMsg" class="mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-          <ion-icon :icon="alertCircleOutline" class="text-lg shrink-0"></ion-icon>
-          <span>{{ errorMsg }}</span>
-        </div>
-
-        <!-- ==================================================== -->
-        <!-- SUB-TAB 1: TAGIHAN SISWA / SPP                       -->
-        <!-- ==================================================== -->
-        <div v-if="activeSubTab === 'tagihan'" class="space-y-4">
-          
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-slate-800">Daftar Tagihan SPP & Iuran Siswa</h2>
-            <!-- Filter jika akun wali vs admin -->
-            <span v-if="authStore.isWali" class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Menampilkan tagihan siswa: {{ authStore.activeSiswa?.nama_lengkap }}
-            </span>
-          </div>
-
-          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <table class="w-full text-left text-xs text-slate-600">
-              <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100">
-                <tr>
-                  <th class="py-3.5 px-4">Nama Siswa</th>
-                  <th class="py-3.5 px-4">Jenis Tagihan</th>
-                  <th class="py-3.5 px-4">Periode</th>
-                  <th class="py-3.5 px-4">Nominal</th>
-                  <th class="py-3.5 px-4 text-center">Status</th>
-                  <th class="py-3.5 px-4 text-right" v-if="!authStore.isWali">Aksi</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                <tr v-for="tag in filteredTagihan" :key="tag.id" class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4">
-                    <span class="font-bold text-slate-800 block">{{ tag.nama_siswa }}</span>
-                    <span class="text-[10px] text-slate-400 font-mono">NIS: {{ tag.nis }} • {{ tag.kelas }}</span>
-                  </td>
-
-                  <td class="py-3.5 px-4">
-                    <span class="font-semibold text-slate-700 block">{{ tag.nama_tagihan }}</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">
-                      {{ tag.tipe_periode }}
-                    </span>
-                  </td>
-
-                  <td class="py-3.5 px-4 font-medium text-slate-700">
-                    {{ tag.periode }} ({{ tag.nama_tahun }})
-                  </td>
-
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-800">
-                    Rp {{ formatRupiah(tag.nominal) }}
-                  </td>
-
-                  <td class="py-3.5 px-4 text-center">
-                    <span
-                      v-if="tag.status === 'lunas'"
-                      class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    >
-                      Lunas
-                    </span>
-                    <span
-                      v-else
-                      class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200"
-                    >
-                      Belum Lunas
-                    </span>
-                  </td>
-
-                  <td class="py-3.5 px-4 text-right" v-if="!authStore.isWali">
-                    <button
-                      v-if="tag.status === 'belum_lunas'"
-                      @click="handleBayar(tag)"
-                      class="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-[11px] shadow-sm transition-all"
-                    >
-                      Terima Bayar
-                    </button>
-                    <span v-else class="text-[10px] text-slate-400 font-medium">
-                      {{ tag.tanggal_bayar.slice(0, 10) }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ==================================================== -->
-        <!-- SUB-TAB 2: BUKU KAS MASUK / KELUAR                   -->
-        <!-- ==================================================== -->
-        <div v-if="activeSubTab === 'kas'" class="space-y-4">
-          
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 class="text-sm font-bold text-slate-800">Buku Kas Umum</h2>
+        <!-- SECTION: SALDO MASING-MASING POS KEUANGAN -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-sm font-bold text-slate-800">Saldo Masing-masing Pos Keuangan</h2>
+              <p class="text-[11px] text-slate-400">Rincian mutasi kas masuk & keluar per pos anggaran</p>
+            </div>
             <button
-              @click="showModalKas = true"
-              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all self-start sm:self-auto"
+              @click="openModalMasterPos"
+              class="text-xs text-brand-600 hover:text-brand-700 font-bold flex items-center gap-1"
             >
-              <ion-icon :icon="addOutline" class="text-base"></ion-icon>
-              Catat Transaksi Kas
+              <span>+ Atur Pos</span>
             </button>
           </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <table class="w-full text-left text-xs text-slate-600">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div
+              v-for="pos in posList"
+              :key="pos.id"
+              class="p-3.5 rounded-xl border transition-all"
+              :class="pos.tipe === 'masuk' ? 'bg-emerald-50/40 border-emerald-200/70' : 'bg-rose-50/40 border-rose-200/70'"
+            >
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <span class="font-bold text-xs text-slate-800 truncate" :title="pos.nama_pos">
+                  {{ pos.nama_pos }}
+                </span>
+                <span
+                  class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase shrink-0"
+                  :class="pos.tipe === 'masuk' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
+                >
+                  {{ pos.tipe }}
+                </span>
+              </div>
+              <p class="text-base font-black font-mono mt-2" :class="pos.tipe === 'masuk' ? 'text-emerald-700' : 'text-rose-700'">
+                {{ pos.tipe === 'masuk' ? '+' : '-' }} Rp {{ formatRupiah(pos.tipe === 'masuk' ? pos.total_masuk : pos.total_keluar) }}
+              </p>
+              <span class="text-[10px] text-slate-400 block mt-0.5 truncate">{{ pos.keterangan || 'Pos anggaran umum' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION: TABEL BUKU KAS UMUM -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden mb-6">
+          <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-sm font-bold text-slate-800">Riwayat Mutasi Buku Kas</h2>
+              <p class="text-[11px] text-slate-400">100 transaksi operasional kas terbaru</p>
+            </div>
+
+            <!-- Filter Tipe Kas -->
+            <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl self-start sm:self-auto">
+              <button
+                @click="filterTipeKas = ''"
+                class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+                :class="filterTipeKas === '' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+              >
+                Semua
+              </button>
+              <button
+                @click="filterTipeKas = 'masuk'"
+                class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+                :class="filterTipeKas === 'masuk' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-emerald-700'"
+              >
+                Kas Masuk
+              </button>
+              <button
+                @click="filterTipeKas = 'keluar'"
+                class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+                :class="filterTipeKas === 'keluar' ? 'bg-white text-rose-700 shadow-sm' : 'text-slate-500 hover:text-rose-700'"
+              >
+                Kas Keluar
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600 min-w-[650px]">
               <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="py-3.5 px-4">Tanggal & Kode</th>
+                  <th class="py-3.5 px-4 w-36">Tanggal & Kode</th>
                   <th class="py-3.5 px-4">Pos Anggaran</th>
-                  <th class="py-3.5 px-4">Keterangan</th>
+                  <th class="py-3.5 px-4">Rincian / Keterangan</th>
                   <th class="py-3.5 px-4 text-right">Nominal</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                <tr v-for="k in kasList" :key="k.id" class="hover:bg-slate-50/60 transition-colors">
+                <tr v-for="k in filteredKasList" :key="k.id" class="hover:bg-slate-50/60 transition-colors">
                   <td class="py-3.5 px-4">
                     <span class="font-bold text-slate-800 block">{{ k.tanggal }}</span>
                     <span class="text-[10px] text-slate-400 font-mono">{{ k.kode_transaksi }}</span>
                   </td>
 
                   <td class="py-3.5 px-4">
-                    <span class="font-semibold text-slate-700 block">{{ k.nama_pos }}</span>
+                    <span class="font-semibold text-slate-800 block">{{ k.nama_pos }}</span>
                     <span
-                      class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase"
+                      class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase mt-0.5"
                       :class="k.tipe === 'masuk' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
                     >
                       Kas {{ k.tipe }}
@@ -195,9 +175,14 @@
                     {{ k.keterangan || '-' }}
                   </td>
 
-                  <td class="py-3.5 px-4 text-right font-mono font-bold"
+                  <td class="py-3.5 px-4 text-right font-mono font-bold text-sm"
                       :class="k.tipe === 'masuk' ? 'text-emerald-600' : 'text-rose-600'">
                     {{ k.tipe === 'masuk' ? '+' : '-' }} Rp {{ formatRupiah(k.nominal) }}
+                  </td>
+                </tr>
+                <tr v-if="filteredKasList.length === 0">
+                  <td colspan="4" class="p-8 text-center text-slate-400 text-xs">
+                    Belum ada transaksi kas yang dicatat.
                   </td>
                 </tr>
               </tbody>
@@ -205,12 +190,14 @@
           </div>
         </div>
 
-        <!-- Modal Tambah Transaksi Kas -->
+        <!-- ==================================================== -->
+        <!-- MODAL 1: CATAT KAS MASUK / KELUAR                    -->
+        <!-- ==================================================== -->
         <div v-if="showModalKas" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-100">
             <h2 class="text-sm font-bold text-slate-800 mb-1">Catat Kas Masuk / Keluar</h2>
             <p class="text-[11px] text-slate-500 mb-4">
-              Masukkan transaksi penerimaan atau pengeluaran dana operasional.
+              Masukkan transaksi penerimaan atau pengeluaran dana operasional lembaga.
             </p>
 
             <form @submit.prevent="handleSubmitKas" class="space-y-3.5">
@@ -219,17 +206,17 @@
                 <div class="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    @click="formKas.tipe = 'masuk'"
-                    class="py-2 text-xs font-bold rounded-xl border transition-all"
-                    :class="formKas.tipe === 'masuk' ? 'bg-emerald-500 text-white border-emerald-500' : 'border-slate-200 text-slate-600'"
+                    @click="setTipeKasForm('masuk')"
+                    class="py-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5"
+                    :class="formKas.tipe === 'masuk' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'border-slate-200 text-slate-600'"
                   >
                     📥 Kas Masuk
                   </button>
                   <button
                     type="button"
-                    @click="formKas.tipe = 'keluar'"
-                    class="py-2 text-xs font-bold rounded-xl border transition-all"
-                    :class="formKas.tipe === 'keluar' ? 'bg-rose-500 text-white border-rose-500' : 'border-slate-200 text-slate-600'"
+                    @click="setTipeKasForm('keluar')"
+                    class="py-2 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5"
+                    :class="formKas.tipe === 'keluar' ? 'bg-rose-500 text-white border-rose-500 shadow-sm' : 'border-slate-200 text-slate-600'"
                   >
                     📤 Kas Keluar
                   </button>
@@ -243,7 +230,7 @@
                   required
                   class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
                 >
-                  <option v-for="p in filteredPos" :key="p.id" :value="p.id">
+                  <option v-for="p in dropdownPosOptions" :key="p.id" :value="p.id">
                     {{ p.nama_pos }} ({{ p.tipe }})
                   </option>
                 </select>
@@ -262,11 +249,12 @@
               <div>
                 <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nominal (Rp)</label>
                 <input
-                  v-model="formKas.nominal"
+                  v-model.number="formKas.nominal"
                   type="number"
+                  min="1"
                   required
                   placeholder="Contoh: 500000"
-                  class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-mono"
+                  class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-mono font-bold"
                 />
               </div>
 
@@ -290,12 +278,133 @@
                 </button>
                 <button
                   type="submit"
-                  class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-sm"
+                  :disabled="isSubmittingKas"
+                  class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-sm disabled:opacity-50"
                 >
-                  Simpan Transaksi
+                  {{ isSubmittingKas ? 'Menyimpan...' : 'Simpan Transaksi' }}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MODAL 2: MASTER POS KEUANGAN & SALDO                -->
+        <!-- ==================================================== -->
+        <div v-if="showModalPos" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div>
+                <h2 class="text-sm font-bold text-slate-800">Master Data Pos Keuangan</h2>
+                <p class="text-[11px] text-slate-400">Kelola pos penerimaan kas masuk dan pos pengeluaran</p>
+              </div>
+              <button @click="showModalPos = false" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
+
+            <!-- Form Tambah Pos Baru -->
+            <form @submit.prevent="handleSubmitPos" class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 mb-5">
+              <h3 class="text-xs font-bold text-slate-700 mb-2">
+                {{ isEditPos ? 'Edit Pos Keuangan' : '+ Tambah Pos Keuangan Baru' }}
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-1">Nama Pos</label>
+                  <input
+                    v-model="formPos.nama_pos"
+                    type="text"
+                    required
+                    placeholder="Contoh: Infaq Gedung"
+                    class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-1">Tipe Arus Kas</label>
+                  <select
+                    v-model="formPos.tipe"
+                    class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  >
+                    <option value="masuk">Kas Masuk (Penerimaan)</option>
+                    <option value="keluar">Kas Keluar (Pengeluaran)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-1">Keterangan Singkat</label>
+                  <input
+                    v-model="formPos.keterangan"
+                    type="text"
+                    placeholder="Opsional..."
+                    class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  />
+                </div>
+              </div>
+              <div class="flex items-center justify-end gap-2">
+                <button
+                  v-if="isEditPos"
+                  type="button"
+                  @click="cancelEditPos"
+                  class="px-3 py-1 rounded-lg text-xs font-medium text-slate-500 hover:bg-slate-200"
+                >
+                  Batal Edit
+                </button>
+                <button
+                  type="submit"
+                  class="px-4 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-sm"
+                >
+                  {{ isEditPos ? 'Perbarui Pos' : 'Simpan Pos' }}
+                </button>
+              </div>
+            </form>
+
+            <!-- Tabel Daftar Pos & Saldo -->
+            <div class="border border-slate-200/80 rounded-xl overflow-hidden">
+              <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100">
+                  <tr>
+                    <th class="py-2.5 px-3">Nama Pos</th>
+                    <th class="py-2.5 px-3">Tipe</th>
+                    <th class="py-2.5 px-3 text-right">Akumulasi Saldo</th>
+                    <th class="py-2.5 px-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="p in posList" :key="p.id" class="hover:bg-slate-50">
+                    <td class="py-2.5 px-3 font-bold text-slate-800">
+                      {{ p.nama_pos }}
+                      <span class="text-[10px] text-slate-400 block font-normal">{{ p.keterangan }}</span>
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <span
+                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase"
+                        :class="p.tipe === 'masuk' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
+                      >
+                        {{ p.tipe }}
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-mono font-bold" :class="p.tipe === 'masuk' ? 'text-emerald-700' : 'text-rose-700'">
+                      Rp {{ formatRupiah(p.tipe === 'masuk' ? p.total_masuk : p.total_keluar) }}
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                      <div class="inline-flex items-center gap-1">
+                        <button
+                          @click="openEditPos(p)"
+                          class="p-1 rounded text-slate-400 hover:text-brand-600 hover:bg-brand-50"
+                          title="Edit"
+                        >
+                          <ion-icon :icon="createOutline" class="text-sm"></ion-icon>
+                        </button>
+                        <button
+                          @click="handleDeletePos(p)"
+                          class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                          title="Hapus"
+                        >
+                          <ion-icon :icon="trashOutline" class="text-sm"></ion-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -308,50 +417,58 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { IonPage, IonContent, IonIcon } from '@ionic/vue'
-import { addOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons'
-import { useAuthStore } from '@/stores/auth'
+import {
+  addOutline, folderOpenOutline, createOutline, trashOutline,
+  checkmarkCircleOutline, alertCircleOutline
+} from 'ionicons/icons'
 
-const authStore = useAuthStore()
-
-const activeSubTab = ref('tagihan')
 const summary = ref({ total_masuk: 0, total_keluar: 0, saldo_kas: 0 })
-const tagihanList = ref([])
 const kasList = ref([])
 const posList = ref([])
 
+const filterTipeKas = ref('')
+
 const showModalKas = ref(false)
+const showModalPos = ref(false)
+const isSubmittingKas = ref(false)
+
 const successMsg = ref('')
 const errorMsg = ref('')
 
 const formKas = ref({
   tipe: 'masuk',
-  pos_id: 1,
+  pos_id: null,
   tanggal: new Date().toISOString().slice(0, 10),
   nominal: '',
   keterangan: ''
 })
+
+const formPos = ref({
+  nama_pos: '',
+  tipe: 'masuk',
+  keterangan: ''
+})
+const isEditPos = ref(false)
+const editPosId = ref(null)
 
 const formatRupiah = (val) => {
   if (!val) return '0'
   return Number(val).toLocaleString('id-ID')
 }
 
+const dropdownPosOptions = computed(() => {
+  return posList.value.filter(p => p.tipe === formKas.value.tipe)
+})
+
+const filteredKasList = computed(() => {
+  if (!filterTipeKas.value) return kasList.value
+  return kasList.value.filter(k => k.tipe === filterTipeKas.value)
+})
+
 const fetchSummary = async () => {
   try {
     const res = await axios.get('/api/keuangan/summary')
     summary.value = res.data || { total_masuk: 0, total_keluar: 0, saldo_kas: 0 }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-const fetchTagihan = async () => {
-  try {
-    const url = authStore.isWali && authStore.activeSiswa
-      ? `/api/keuangan/tagihan?siswa_id=${authStore.activeSiswa.id}`
-      : '/api/keuangan/tagihan'
-    const res = await axios.get(url)
-    tagihanList.value = res.data || []
   } catch (err) {
     console.error(err)
   }
@@ -370,57 +487,106 @@ const fetchPos = async () => {
   try {
     const res = await axios.get('/api/keuangan/pos')
     posList.value = res.data || []
-    if (posList.value.length > 0) {
-      formKas.value.pos_id = posList.value[0].id
+    if (posList.value.length > 0 && !formKas.value.pos_id) {
+      const firstMatch = posList.value.find(p => p.tipe === formKas.value.tipe)
+      if (firstMatch) formKas.value.pos_id = firstMatch.id
     }
   } catch (err) {
     console.error(err)
   }
 }
 
-const filteredPos = computed(() => {
-  return posList.value.filter(p => p.tipe === formKas.value.tipe)
-})
-
-const filteredTagihan = computed(() => {
-  if (authStore.isWali && authStore.activeSiswa) {
-    return tagihanList.value.filter(t => t.siswa_id === authStore.activeSiswa.id)
-  }
-  return tagihanList.value
-})
-
-const handleBayar = async (tag) => {
-  if (!confirm(`Konfirmasi pembayaran tagihan ${tag.nama_tagihan} (${tag.periode}) an. ${tag.nama_siswa} sebesar Rp ${formatRupiah(tag.nominal)}?`)) return
-  try {
-    await axios.post(`/api/keuangan/tagihan/${tag.id}/bayar`)
-    successMsg.value = `Pembayaran ${tag.nama_tagihan} berhasil dicatat & masuk kas!`
-    await fetchTagihan()
-    await fetchSummary()
-    await fetchKas()
-    setTimeout(() => { successMsg.value = '' }, 4000)
-  } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal memproses pembayaran'
+const setTipeKasForm = (tipe) => {
+  formKas.value.tipe = tipe
+  const firstMatch = posList.value.find(p => p.tipe === tipe)
+  if (firstMatch) {
+    formKas.value.pos_id = firstMatch.id
   }
 }
 
+const openModalCatatKas = () => {
+  formKas.value.tanggal = new Date().toISOString().slice(0, 10)
+  formKas.value.nominal = ''
+  formKas.value.keterangan = ''
+  setTipeKasForm('masuk')
+  showModalKas.value = true
+}
+
+const openModalMasterPos = () => {
+  isEditPos.value = false
+  editPosId.value = null
+  formPos.value = { nama_pos: '', tipe: 'masuk', keterangan: '' }
+  showModalPos.value = true
+}
+
+const openEditPos = (pos) => {
+  isEditPos.value = true
+  editPosId.value = pos.id
+  formPos.value = { nama_pos: pos.nama_pos, tipe: pos.tipe, keterangan: pos.keterangan }
+}
+
+const cancelEditPos = () => {
+  isEditPos.value = false
+  editPosId.value = null
+  formPos.value = { nama_pos: '', tipe: 'masuk', keterangan: '' }
+}
+
 const handleSubmitKas = async () => {
+  isSubmittingKas.value = true
+  successMsg.value = ''
+  errorMsg.value = ''
   try {
     await axios.post('/api/keuangan/kas', formKas.value)
-    successMsg.value = 'Transaksi kas berhasil dicatat!'
+    successMsg.value = 'Transaksi kas berhasil dicatat ke buku kas!'
     showModalKas.value = false
-    formKas.value.nominal = ''
-    formKas.value.keterangan = ''
     await fetchSummary()
     await fetchKas()
-    setTimeout(() => { successMsg.value = '' }, 4000)
+    await fetchPos()
   } catch (err) {
     errorMsg.value = err.response?.data?.error || 'Gagal menyimpan transaksi'
+  } finally {
+    isSubmittingKas.value = false
+    setTimeout(() => { successMsg.value = ''; errorMsg.value = '' }, 4000)
+  }
+}
+
+const handleSubmitPos = async () => {
+  successMsg.value = ''
+  errorMsg.value = ''
+  try {
+    if (isEditPos.value) {
+      await axios.put(`/api/keuangan/pos/${editPosId.value}`, formPos.value)
+      successMsg.value = 'Pos keuangan berhasil diperbarui'
+    } else {
+      await axios.post('/api/keuangan/pos', formPos.value)
+      successMsg.value = 'Pos keuangan baru berhasil ditambahkan'
+    }
+    cancelEditPos()
+    await fetchPos()
+  } catch (err) {
+    errorMsg.value = err.response?.data?.error || 'Gagal menyimpan pos keuangan'
+  } finally {
+    setTimeout(() => { successMsg.value = ''; errorMsg.value = '' }, 4000)
+  }
+}
+
+const handleDeletePos = async (p) => {
+  if (!confirm(`Hapus pos keuangan "${p.nama_pos}"?`)) return
+  successMsg.value = ''
+  errorMsg.value = ''
+  try {
+    await axios.delete(`/api/keuangan/pos/${p.id}`)
+    successMsg.value = 'Pos keuangan berhasil dihapus'
+    await fetchPos()
+  } catch (err) {
+    errorMsg.value = err.response?.data?.error || 'Gagal menghapus pos keuangan'
+  } finally {
+    setTimeout(() => { successMsg.value = ''; errorMsg.value = '' }, 4000)
   }
 }
 
 onMounted(() => {
   fetchSummary()
-  fetchTagihan()
   fetchKas()
   fetchPos()
 })

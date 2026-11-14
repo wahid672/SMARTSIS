@@ -182,6 +182,19 @@ func MigrateSchema() {
 			log.Fatalf("Error migrasi schema: %v\nQuery: %s", err, q)
 		}
 	}
+
+	// Pembersihan dan migrasi kolom baru
+	DB.Exec(`DELETE FROM pos_keuangan WHERE LOWER(TRIM(nama_pos)) = 'spp santri'`)
+	DB.Exec(`DELETE FROM pos_keuangan WHERE id NOT IN (
+		SELECT MIN(id) FROM pos_keuangan GROUP BY LOWER(TRIM(nama_pos)), tipe
+	)`)
+	DB.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_pos_keuangan_nama_tipe ON pos_keuangan(nama_pos, tipe)`)
+
+	DB.Exec(`ALTER TABLE pos_tagihan ADD COLUMN pos_id INTEGER DEFAULT 1`)
+	DB.Exec(`ALTER TABLE pos_tagihan ADD COLUMN tahun_ajaran_id INTEGER DEFAULT 1`)
+	DB.Exec(`ALTER TABLE pos_tagihan ADD COLUMN tipe_bayar TEXT DEFAULT 'bulanan'`)
+	DB.Exec(`ALTER TABLE tagihan_siswa ADD COLUMN bulan TEXT DEFAULT ''`)
+
 	log.Println("Migrasi tabel SQLite berhasil dijalankan.")
 }
 
@@ -199,7 +212,9 @@ func SeedInitialData() {
 		DB.Exec(`INSERT OR IGNORE INTO roles (name, label, description) VALUES (?, ?, ?)`, r.name, r.label, r.desc)
 	}
 
-	// 2. Menus Default Berkelompok (Menu Utama, Akademik, Master Data, Pengaturan)
+	// 2. Menus Default Berkelompok (Menu Utama, Akademik, Keuangan, Master Data, Pengaturan)
+	DB.Exec(`DELETE FROM menus WHERE code = 'spp'`)
+
 	menus := []struct {
 		code, title, icon, path, category string
 		sort                              int
@@ -207,15 +222,16 @@ func SeedInitialData() {
 		{"dashboard", "Beranda", "home-outline", "/tabs/dashboard", "UTAMA", 1},
 		{"presensi", "Presensi & Absensi", "calendar-outline", "/tabs/presensi", "AKADEMIK", 2},
 		{"nilai", "Nilai & Rapor", "ribbon-outline", "/tabs/nilai", "AKADEMIK", 3},
-		{"spp", "Keuangan", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
-		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 5},
-		{"kelas_mgmt", "Data Kelas", "school-outline", "/admin/kelas", "DATA MASTER", 6},
-		{"mapel_mgmt", "Mata Pelajaran", "book-outline", "/admin/mapel", "DATA MASTER", 7},
-		{"tahun_ajaran_mgmt", "Tahun Ajaran", "calendar-number-outline", "/admin/tahun-ajaran", "DATA MASTER", 8},
-		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 9},
-		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 10},
-		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 11},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 12},
+		{"kas_pos", "Buku Kas & Pos", "wallet-outline", "/keuangan/kas", "KEUANGAN", 4},
+		{"tagihan_siswa", "Tagihan Siswa", "cash-outline", "/keuangan/tagihan", "KEUANGAN", 5},
+		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 6},
+		{"kelas_mgmt", "Data Kelas", "school-outline", "/admin/kelas", "DATA MASTER", 7},
+		{"mapel_mgmt", "Mata Pelajaran", "book-outline", "/admin/mapel", "DATA MASTER", 8},
+		{"tahun_ajaran_mgmt", "Tahun Ajaran", "calendar-number-outline", "/admin/tahun-ajaran", "DATA MASTER", 9},
+		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 10},
+		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 11},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 12},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 13},
 	}
 
 	// Pastikan kolom category ada jika tabel sudah ada sebelumnya
@@ -238,7 +254,7 @@ func SeedInitialData() {
 
 	// 5. Hak Akses Menu Role Wali Murid
 	DB.Exec(`INSERT OR IGNORE INTO role_menus (role_id, menu_id, can_view, can_create, can_edit, can_delete)
-		SELECT 3, id, 1, 0, 0, 0 FROM menus WHERE code IN ('dashboard', 'presensi', 'nilai', 'spp', 'profil');`)
+		SELECT 3, id, 1, 0, 0, 0 FROM menus WHERE code IN ('dashboard', 'presensi', 'nilai', 'tagihan_siswa', 'profil');`)
 
 	// 6. Akun Default Admin & Wali Contoh
 	hashPass, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
@@ -287,13 +303,17 @@ func SeedInitialData() {
 		{"Listrik, Air & Internet", "keluar", "Biaya utilitas sarana dan prasarana"},
 	}
 	for _, p := range posList {
-		DB.Exec(`INSERT OR IGNORE INTO pos_keuangan (nama_pos, tipe, keterangan) VALUES (?, ?, ?)`, p.nama, p.tipe, p.ket)
+		var exists int
+		DB.QueryRow(`SELECT COUNT(*) FROM pos_keuangan WHERE LOWER(TRIM(nama_pos)) = LOWER(TRIM(?)) AND tipe = ?`, p.nama, p.tipe).Scan(&exists)
+		if exists == 0 {
+			DB.Exec(`INSERT INTO pos_keuangan (nama_pos, tipe, keterangan) VALUES (?, ?, ?)`, p.nama, p.tipe, p.ket)
+		}
 	}
 
-	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
-		VALUES (1, 'SPP Siswa Bulanan', 'bulanan', 350000, 'SPP reguler siswa')`)
-	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
-		VALUES (2, 'Daftar Ulang Tahunan', 'tahunan', 1500000, 'Iuran tahunan fasilitas dan seragam siswa')`)
+	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, pos_id, tahun_ajaran_id, nama_tagihan, tipe_periode, tipe_bayar, nominal, keterangan)
+		VALUES (1, 1, 1, 'SPP SMP - T.A 2026/2027', 'bulanan', 'bulanan', 350000, 'SPP reguler bulanan')`)
+	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, pos_id, tahun_ajaran_id, nama_tagihan, tipe_periode, tipe_bayar, nominal, keterangan)
+		VALUES (2, 2, 1, 'Daftar Ulang Siswa Baru', 'tahunan', 'bebas', 1500000, 'Iuran tahunan fasilitas dan seragam siswa')`)
 
 	// Generate contoh tagihan siswa untuk 2 siswa demo
 	DB.Exec(`INSERT OR IGNORE INTO tagihan_siswa (id, siswa_id, pos_tagihan_id, tahun_ajaran_id, periode, nominal, terbayar, status, tanggal_bayar)

@@ -16,6 +16,7 @@ import TahunAjaranView from '@/views/TahunAjaranView.vue'
 import PresensiView from '@/views/PresensiView.vue'
 import NilaiView from '@/views/NilaiView.vue'
 import MapelView from '@/views/MapelView.vue'
+import TagihanView from '@/views/TagihanView.vue'
 
 const routes = [
   {
@@ -56,9 +57,19 @@ const routes = [
       },
       {
         path: '/tabs/spp',
-        name: 'Keuangan',
+        redirect: '/keuangan/kas'
+      },
+      {
+        path: '/keuangan/kas',
+        name: 'BukuKas',
         component: KeuanganView,
-        meta: { title: 'Keuangan' }
+        meta: { title: 'Buku Kas & Pos' }
+      },
+      {
+        path: '/keuangan/tagihan',
+        name: 'TagihanSiswa',
+        component: TagihanView,
+        meta: { title: 'Tagihan Siswa' }
       },
       {
         path: '/tabs/profil',

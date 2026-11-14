@@ -85,12 +85,25 @@ func main() {
 			protected.POST("/nilai/batch", handlers.SaveNilaiBatch)
 			protected.GET("/nilai/rapor", handlers.GetRaporSiswa)
 
-			// Modul Keuangan & SPP
+			// Modul Keuangan & Kas
 			protected.GET("/keuangan/summary", handlers.GetCashflowSummary)
 			protected.GET("/keuangan/pos", handlers.GetPosKeuangan)
 			protected.POST("/keuangan/pos", handlers.CreatePosKeuangan)
+			protected.PUT("/keuangan/pos/:id", handlers.UpdatePosKeuangan)
+			protected.DELETE("/keuangan/pos/:id", handlers.DeletePosKeuangan)
 			protected.GET("/keuangan/kas", handlers.GetTransaksiKas)
 			protected.POST("/keuangan/kas", handlers.CreateTransaksiKas)
+
+			// Master Pos Tagihan & Setting Tarif Pembayaran Siswa
+			protected.GET("/keuangan/pos-tagihan", handlers.GetPosTagihan)
+			protected.POST("/keuangan/pos-tagihan", handlers.CreatePosTagihan)
+			protected.PUT("/keuangan/pos-tagihan/:id", handlers.UpdatePosTagihan)
+			protected.DELETE("/keuangan/pos-tagihan/:id", handlers.DeletePosTagihan)
+			protected.GET("/keuangan/tagihan/tarif", handlers.GetTarifKelas)
+			protected.POST("/keuangan/tagihan/tarif/kelas", handlers.SaveTarifKelasBatch)
+			protected.DELETE("/keuangan/tagihan/tarif/kelas", handlers.DeleteTarifKelas)
+
+			// Transaksi Tagihan & Kasir Siswa
 			protected.GET("/keuangan/tagihan", handlers.GetAllTagihan)
 			protected.POST("/keuangan/tagihan/:id/bayar", handlers.BayarTagihan)
 
