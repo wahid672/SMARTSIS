@@ -74,6 +74,17 @@ func main() {
 			protected.PUT("/admin/tahun-ajaran/:id/activate", handlers.SetActiveTahunAjaran)
 			protected.DELETE("/admin/tahun-ajaran/:id", handlers.DeleteTahunAjaran)
 
+			// Master Mata Pelajaran
+			protected.GET("/admin/mapel", handlers.GetAllMapel)
+			protected.POST("/admin/mapel", handlers.CreateMapel)
+			protected.PUT("/admin/mapel/:id", handlers.UpdateMapel)
+			protected.DELETE("/admin/mapel/:id", handlers.DeleteMapel)
+
+			// Modul Nilai & Rapor Digital
+			protected.GET("/nilai/kelas", handlers.GetNilaiKelas)
+			protected.POST("/nilai/batch", handlers.SaveNilaiBatch)
+			protected.GET("/nilai/rapor", handlers.GetRaporSiswa)
+
 			// Modul Keuangan & SPP
 			protected.GET("/keuangan/summary", handlers.GetCashflowSummary)
 			protected.GET("/keuangan/pos", handlers.GetPosKeuangan)

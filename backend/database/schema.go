@@ -148,6 +148,32 @@ func MigrateSchema() {
 			UNIQUE(siswa_id, tanggal),
 			FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE
 		);`,
+
+		`CREATE TABLE IF NOT EXISTS mata_pelajaran (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			kode_mapel TEXT NOT NULL UNIQUE,
+			nama_mapel TEXT NOT NULL,
+			kategori TEXT NOT NULL CHECK(kategori IN ('Diniyyah / Pesantren', 'Umum / Nasional')),
+			kkm REAL DEFAULT 75
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS nilai_siswa (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			siswa_id INTEGER NOT NULL,
+			mapel_id INTEGER NOT NULL,
+			tahun_ajaran_id INTEGER NOT NULL,
+			nilai_tugas REAL DEFAULT 0,
+			nilai_pts REAL DEFAULT 0,
+			nilai_pas REAL DEFAULT 0,
+			nilai_akhir REAL DEFAULT 0,
+			predikat TEXT DEFAULT 'C',
+			catatan TEXT,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			UNIQUE(siswa_id, mapel_id, tahun_ajaran_id),
+			FOREIGN KEY (siswa_id) REFERENCES siswa(id) ON DELETE CASCADE,
+			FOREIGN KEY (mapel_id) REFERENCES mata_pelajaran(id) ON DELETE CASCADE,
+			FOREIGN KEY (tahun_ajaran_id) REFERENCES tahun_ajaran(id)
+		);`,
 	}
 
 	for _, q := range queries {
@@ -184,11 +210,12 @@ func SeedInitialData() {
 		{"spp", "Keuangan", "wallet-outline", "/tabs/spp", "AKADEMIK", 4},
 		{"siswa_mgmt", "Data Siswa", "people-outline", "/admin/siswa", "DATA MASTER", 5},
 		{"kelas_mgmt", "Data Kelas", "school-outline", "/admin/kelas", "DATA MASTER", 6},
-		{"tahun_ajaran_mgmt", "Tahun Ajaran", "calendar-number-outline", "/admin/tahun-ajaran", "DATA MASTER", 7},
-		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 8},
-		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 9},
-		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 10},
-		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 11},
+		{"mapel_mgmt", "Mata Pelajaran", "book-outline", "/admin/mapel", "DATA MASTER", 7},
+		{"tahun_ajaran_mgmt", "Tahun Ajaran", "calendar-number-outline", "/admin/tahun-ajaran", "DATA MASTER", 8},
+		{"pegawai_mgmt", "Data Pegawai", "briefcase-outline", "/admin/pegawai", "DATA MASTER", 9},
+		{"role_mgmt", "Manajemen Hak Akses", "shield-checkmark-outline", "/admin/roles", "PENGATURAN", 10},
+		{"pengaturan", "Identitas Lembaga", "settings-outline", "/admin/pengaturan", "PENGATURAN", 11},
+		{"profil", "Profil Akun", "person-outline", "/tabs/profil", "PENGATURAN", 12},
 	}
 
 	// Pastikan kolom category ada jika tabel sudah ada sebelumnya
@@ -280,6 +307,49 @@ func SeedInitialData() {
 		VALUES (1, ?, 'Hadir', 'Tepat waktu', 1)`, today)
 	DB.Exec(`INSERT OR IGNORE INTO presensi_siswa (siswa_id, tanggal, status, keterangan, recorded_by)
 		VALUES (2, ?, 'Hadir', 'Tepat waktu', 1)`, today)
+
+	// 7f. Data Mata Pelajaran Contoh
+	mapelDefault := []struct {
+		kode, nama, kategori string
+		kkm                  float64
+	}{
+		{"TFQ", "Tahfidz Al-Qur'an & Tajwid", "Diniyyah / Pesantren", 75},
+		{"FQH", "Fiqih & Ibadah Praktis", "Diniyyah / Pesantren", 75},
+		{"AQD", "Aqidah Akhlak", "Diniyyah / Pesantren", 75},
+		{"ARB", "Bahasa Arab", "Diniyyah / Pesantren", 70},
+		{"IND", "Bahasa Indonesia", "Umum / Nasional", 75},
+		{"ENG", "Bahasa Inggris", "Umum / Nasional", 70},
+		{"MTK", "Matematika", "Umum / Nasional", 70},
+		{"IPA", "Ilmu Pengetahuan Alam (IPA)", "Umum / Nasional", 72},
+	}
+	for _, m := range mapelDefault {
+		DB.Exec(`INSERT OR IGNORE INTO mata_pelajaran (kode_mapel, nama_mapel, kategori, kkm)
+			VALUES (?, ?, ?, ?)`, m.kode, m.nama, m.kategori, m.kkm)
+	}
+
+	// 7g. Nilai Siswa Contoh untuk Demo Rapor
+	contohNilai := []struct {
+		siswaID, mapelID, taID           int
+		tugas, pts, pas, akhir           float64
+		predikat, catatan                string
+	}{
+		{1, 1, 1, 90, 88, 92, 90.2, "A", "Makharijul huruf dan hafalan sangat baik serta lancar"},
+		{1, 2, 1, 85, 82, 85, 84.1, "B", "Memahami rukun dan syarat ibadah sholat dan thaharah"},
+		{1, 3, 1, 88, 86, 90, 88.2, "A", "Berakhlak terpuji dan santun kepada sesama"},
+		{1, 4, 1, 80, 78, 82, 80.2, "B", "Kosakata mufradat semakin bertambah"},
+		{1, 5, 1, 85, 80, 84, 83.1, "B", "Keterampilan menulis narasi berkembang baik"},
+		{1, 7, 1, 78, 75, 80, 77.9, "B", "Ditingkatkan lagi latihan soal operasi aljabar"},
+
+		{2, 1, 1, 95, 92, 96, 94.5, "A", "Hafalan juz 30 mutqin dan tartil sangat indah"},
+		{2, 2, 1, 88, 85, 88, 87.1, "B", "Aktif dalam kajian fiqih wanita dan ibadah harian"},
+		{2, 6, 1, 85, 88, 90, 87.9, "B", "Grammar and conversation skills are great"},
+		{2, 8, 1, 86, 84, 88, 86.2, "B", "Pemahaman konsep biologi dan ekosistem sangat baik"},
+	}
+	for _, n := range contohNilai {
+		DB.Exec(`INSERT OR IGNORE INTO nilai_siswa (siswa_id, mapel_id, tahun_ajaran_id, nilai_tugas, nilai_pts, nilai_pas, nilai_akhir, predikat, catatan)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			n.siswaID, n.mapelID, n.taID, n.tugas, n.pts, n.pas, n.akhir, n.predikat, n.catatan)
+	}
 
 	// 8. Pengaturan Identitas Lembaga Default
 	settingsDefault := []struct {

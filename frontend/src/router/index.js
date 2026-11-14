@@ -14,6 +14,8 @@ import KelasView from '@/views/KelasView.vue'
 import KeuanganView from '@/views/KeuanganView.vue'
 import TahunAjaranView from '@/views/TahunAjaranView.vue'
 import PresensiView from '@/views/PresensiView.vue'
+import NilaiView from '@/views/NilaiView.vue'
+import MapelView from '@/views/MapelView.vue'
 
 const routes = [
   {
@@ -49,7 +51,7 @@ const routes = [
       {
         path: '/tabs/nilai',
         name: 'Nilai',
-        component: PlaceholderView,
+        component: NilaiView,
         meta: { title: 'Nilai & Rapor' }
       },
       {
@@ -75,6 +77,12 @@ const routes = [
         name: 'AdminKelas',
         component: KelasView,
         meta: { title: 'Master Data Kelas' }
+      },
+      {
+        path: '/admin/mapel',
+        name: 'AdminMapel',
+        component: MapelView,
+        meta: { title: 'Master Mata Pelajaran' }
       },
       {
         path: '/admin/tahun-ajaran',

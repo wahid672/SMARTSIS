@@ -133,7 +133,8 @@ import {
 } from '@ionic/vue'
 import {
   homeOutline, calendarOutline, ribbonOutline, walletOutline,
-  peopleOutline, briefcaseOutline, shieldCheckmarkOutline, personOutline, logOutOutline, settingsOutline
+  peopleOutline, briefcaseOutline, shieldCheckmarkOutline, personOutline, logOutOutline, settingsOutline,
+  schoolOutline, calendarNumberOutline, bookOutline
 } from 'ionicons/icons'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
@@ -176,7 +177,10 @@ const iconMap = {
   'briefcase-outline': briefcaseOutline,
   'shield-checkmark-outline': shieldCheckmarkOutline,
   'settings-outline': settingsOutline,
-  'person-outline': personOutline
+  'person-outline': personOutline,
+  'school-outline': schoolOutline,
+  'calendar-number-outline': calendarNumberOutline,
+  'book-outline': bookOutline
 }
 
 const getIcon = (name) => iconMap[name] || homeOutline
