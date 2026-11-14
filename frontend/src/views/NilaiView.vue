@@ -4,7 +4,7 @@
       <div class="max-w-6xl mx-auto py-2">
 
         <!-- ==================================================== -->
-        <!-- 1. TAMPILAN KHUSUS WALI SANTRI (RAPOR DIGITAL ANAK) -->
+        <!-- 1. TAMPILAN KHUSUS WALI SISWA (RAPOR DIGITAL ANAK)  -->
         <!-- ==================================================== -->
         <div v-if="authStore.isWali">
           <!-- Header Rapor -->
@@ -12,7 +12,7 @@
             <div>
               <h1 class="text-xl font-bold text-slate-800">Buku Rapor & Capaian Akademik</h1>
               <p class="text-xs text-slate-500 mt-1">
-                Laporan penilaian hasil belajar santri an. 
+                Laporan penilaian hasil belajar siswa an. 
                 <span class="font-bold text-brand-600">{{ raporData.siswa?.nama_lengkap || authStore.activeSiswa?.nama_lengkap }}</span> 
                 ({{ raporData.siswa?.kelas || authStore.activeSiswa?.kelas }})
               </p>
@@ -47,7 +47,7 @@
             </div>
 
             <div class="bg-gradient-to-br from-indigo-50 to-purple-100/50 p-4 rounded-2xl border border-indigo-200/60 shadow-sm text-center">
-              <span class="text-[10px] font-bold text-indigo-800 uppercase tracking-wider block">Presensi Santri</span>
+              <span class="text-[10px] font-bold text-indigo-800 uppercase tracking-wider block">Presensi Siswa</span>
               <p class="text-3xl font-black text-indigo-700 mt-1">{{ raporData.presensi?.hadir || 0 }} Hari</p>
               <span class="text-[10px] text-indigo-600 font-semibold mt-1 block">
                 S: {{ raporData.presensi?.sakit || 0 }} | I: {{ raporData.presensi?.izin || 0 }} | A: {{ raporData.presensi?.alpa || 0 }}
@@ -210,7 +210,7 @@
             <div>
               <h1 class="text-xl font-bold text-slate-800">Manajemen Nilai & Rapor</h1>
               <p class="text-xs text-slate-500 mt-1">
-                Input evaluasi belajar siswa (Tugas, PTS, PAS) dan terbitkan rapor digital santri.
+                Input evaluasi belajar siswa (Tugas, PTS, PAS) dan terbitkan rapor digital siswa.
               </p>
             </div>
 
@@ -316,7 +316,7 @@
                 Memuat data siswa kelas {{ filterInput.kelas }}...
               </div>
               <div v-else-if="inputStudents.length === 0" class="p-12 text-center text-slate-400 text-xs">
-                Tidak ada data santri di kelas ini atau silakan pilih kelas & mapel terlebih dahulu.
+                Tidak ada data siswa di kelas ini atau silakan pilih kelas & mapel terlebih dahulu.
               </div>
               <div v-else class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-600 min-w-[700px]">
@@ -397,10 +397,10 @@
 
           <!-- TAB 2: LIHAT RAPOR SISWA PILIHAN GURU / ADMIN -->
           <div v-else-if="adminTab === 'rapor'">
-            <!-- Selector Santri & Tahun Ajaran -->
+            <!-- Selector Siswa & Tahun Ajaran -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Siswa / Santri</label>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Siswa</label>
                 <select
                   v-model="selectedRaporSiswaID"
                   @change="loadAdminRapor"
@@ -440,7 +440,7 @@
                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-md transition-all"
                 >
                   <ion-icon :icon="printOutline" class="text-base"></ion-icon>
-                  Cetak Rapor Santri
+                  Cetak Rapor Siswa
                 </button>
               </div>
 
@@ -727,7 +727,7 @@ const simpanSemuaNilai = async () => {
   }
 }
 
-// Load Rapor untuk Wali Santri
+// Load Rapor untuk Wali Siswa
 const loadWaliRapor = async () => {
   try {
     const siswaID = authStore.activeSiswa?.id

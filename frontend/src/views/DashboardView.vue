@@ -13,7 +13,7 @@
             <div v-if="authStore.isWali && authStore.activeSiswa">
               <div class="flex items-center gap-2 mb-2">
                 <span class="inline-block text-[11px] font-bold text-amber-900 bg-amber-400 px-3 py-1 rounded-full shadow-sm">
-                  Santri / Siswa Aktif
+                  Siswa Aktif
                 </span>
                 <select
                   v-if="authStore.daftarSiswa.length > 1"

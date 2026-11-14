@@ -8,7 +8,7 @@
           <div>
             <h1 class="text-xl font-bold text-slate-800">Master Tahun Ajaran</h1>
             <p class="text-xs text-slate-500 mt-1">
-              Atur tahun ajaran aktif dan semester sebagai rujukan akademik serta tagihan santri.
+              Atur tahun ajaran aktif dan semester sebagai rujukan akademik serta tagihan siswa.
             </p>
           </div>
           <button

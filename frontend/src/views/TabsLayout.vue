@@ -28,7 +28,7 @@
             <!-- Switcher Siswa di Sidebar untuk Akun Wali -->
             <div v-if="authStore.isWali && authStore.daftarSiswa.length > 0" class="p-3 mx-3 mt-3 bg-black/20 rounded-xl border border-white/10">
               <label class="text-[10px] font-bold text-amber-300 uppercase tracking-wider block mb-1">
-                Santri / Siswa Aktif:
+                Siswa Aktif:
               </label>
               <select
                 :value="authStore.activeSiswa?.id"

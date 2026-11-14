@@ -153,7 +153,7 @@ func CreateTransaksiKas(c *gin.Context) {
 }
 
 // ==========================================
-// 3. TAGIHAN SANTRI / SPP (BULANAN/SEMESTER/TAHUNAN)
+// 3. TAGIHAN SISWA / SPP (BULANAN/SEMESTER/TAHUNAN)
 // ==========================================
 func GetAllTagihan(c *gin.Context) {
 	siswaIDStr := c.Query("siswa_id")

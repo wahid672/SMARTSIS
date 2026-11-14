@@ -8,7 +8,7 @@
           <div>
             <h1 class="text-xl font-bold text-slate-800">Manajemen Keuangan</h1>
             <p class="text-xs text-slate-500 mt-1">
-              Buku kas umum (kas masuk/keluar), pos anggaran, dan penagihan SPP santri.
+              Buku kas umum (kas masuk/keluar), pos anggaran, dan penagihan SPP siswa.
             </p>
           </div>
 
@@ -69,15 +69,15 @@
         </div>
 
         <!-- ==================================================== -->
-        <!-- SUB-TAB 1: TAGIHAN SANTRI / SPP                      -->
+        <!-- SUB-TAB 1: TAGIHAN SISWA / SPP                       -->
         <!-- ==================================================== -->
         <div v-if="activeSubTab === 'tagihan'" class="space-y-4">
           
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-slate-800">Daftar Tagihan SPP & Iuran Santri</h2>
+            <h2 class="text-sm font-bold text-slate-800">Daftar Tagihan SPP & Iuran Siswa</h2>
             <!-- Filter jika akun wali vs admin -->
             <span v-if="authStore.isWali" class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Menampilkan tagihan santri: {{ authStore.activeSiswa?.nama_lengkap }}
+              Menampilkan tagihan siswa: {{ authStore.activeSiswa?.nama_lengkap }}
             </span>
           </div>
 
@@ -85,7 +85,7 @@
             <table class="w-full text-left text-xs text-slate-600">
               <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="py-3.5 px-4">Nama Santri</th>
+                  <th class="py-3.5 px-4">Nama Siswa</th>
                   <th class="py-3.5 px-4">Jenis Tagihan</th>
                   <th class="py-3.5 px-4">Periode</th>
                   <th class="py-3.5 px-4">Nominal</th>

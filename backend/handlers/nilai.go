@@ -210,13 +210,13 @@ func GetRaporSiswa(c *gin.Context) {
 		if siswaID > 0 {
 			err := database.DB.QueryRow(`SELECT siswa_id FROM wali_siswa WHERE wali_user_id = ? AND siswa_id = ?`, userIDVal, siswaID).Scan(&allowedSiswaID)
 			if err != nil {
-				c.JSON(http.StatusForbidden, gin.H{"error": "Anda tidak memiliki akses ke data rapor santri ini"})
+				c.JSON(http.StatusForbidden, gin.H{"error": "Anda tidak memiliki akses ke data rapor siswa ini"})
 				return
 			}
 		} else {
 			err := database.DB.QueryRow(`SELECT siswa_id FROM wali_siswa WHERE wali_user_id = ? ORDER BY id ASC LIMIT 1`, userIDVal).Scan(&siswaID)
 			if err != nil {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Belum ada santri yang terhubung dengan akun Anda"})
+				c.JSON(http.StatusNotFound, gin.H{"error": "Belum ada siswa yang terhubung dengan akun Anda"})
 				return
 			}
 		}
@@ -239,7 +239,7 @@ func GetRaporSiswa(c *gin.Context) {
 	err := database.DB.QueryRow(`SELECT id, nis, nisn, nama_lengkap, jenis_kelamin, kelas FROM siswa WHERE id = ?`, siswaID).
 		Scan(&siswa.ID, &siswa.NIS, &siswa.NISN, &siswa.NamaLengkap, &siswa.JenisKelamin, &siswa.Kelas)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Data santri tidak ditemukan"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Data siswa tidak ditemukan"})
 		return
 	}
 

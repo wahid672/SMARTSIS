@@ -68,7 +68,7 @@ func GetPresensiByKelasDanTanggal(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
-// SavePresensiBatch menyimpan / memperbarui absensi santri satu kelas secara massal
+// SavePresensiBatch menyimpan / memperbarui absensi siswa satu kelas secara massal
 func SavePresensiBatch(c *gin.Context) {
 	var body struct {
 		Tanggal string `json:"tanggal" binding:"required"`
@@ -124,7 +124,7 @@ func SavePresensiBatch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data presensi berhasil disimpan"})
 }
 
-// GetRekapPresensiWali mengambil rekap persentase dan riwayat absensi santri untuk Wali Murid
+// GetRekapPresensiWali mengambil rekap persentase dan riwayat absensi siswa untuk Wali Murid
 func GetRekapPresensiWali(c *gin.Context) {
 	siswaIDStr := c.Query("siswa_id")
 	siswaID, _ := strconv.Atoi(siswaIDStr)

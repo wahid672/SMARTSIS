@@ -6,9 +6,9 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 class="text-xl font-bold text-slate-800">Manajemen Data Siswa / Santri</h1>
+            <h1 class="text-xl font-bold text-slate-800">Manajemen Data Siswa</h1>
             <p class="text-xs text-slate-500 mt-1">
-              Data santri terhubung langsung dengan akun login wali murid via nomor WhatsApp/HP.
+              Data siswa terhubung langsung dengan akun login wali murid via nomor WhatsApp/HP.
             </p>
           </div>
           <button
@@ -36,7 +36,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Cari berdasarkan nama santri atau NIS..."
+              placeholder="Cari berdasarkan nama siswa atau NIS..."
               class="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-slate-800"
             />
             <ion-icon :icon="searchOutline" class="absolute left-3 top-2.5 text-slate-400 text-sm"></ion-icon>
@@ -60,7 +60,7 @@
             <table class="w-full text-left text-xs text-slate-600">
               <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="py-3.5 px-4">Nama Santri / Siswa</th>
+                  <th class="py-3.5 px-4">Nama Siswa</th>
                   <th class="py-3.5 px-4">NIS / NISN</th>
                   <th class="py-3.5 px-4">Kelas</th>
                   <th class="py-3.5 px-4">Akun Login Wali (No. WA)</th>
@@ -141,20 +141,20 @@
         <div v-if="showModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
             <h2 class="text-sm font-bold text-slate-800 mb-1">
-              {{ isEditing ? 'Edit Data Santri' : 'Tambah Santri / Siswa Baru' }}
+              {{ isEditing ? 'Edit Data Siswa' : 'Tambah Siswa Baru' }}
             </h2>
             <p class="text-[11px] text-slate-500 mb-4">
-              Lengkapi data santri dan nomor WhatsApp wali murid untuk akses login otomatis.
+              Lengkapi data siswa dan nomor WhatsApp wali murid untuk akses login otomatis.
             </p>
 
             <form @submit.prevent="handleSubmit" class="space-y-4">
               
-              <!-- Bagian Data Santri -->
+              <!-- Bagian Data Siswa -->
               <div class="bg-slate-50/70 p-3.5 rounded-xl border border-slate-200/60 space-y-3">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Identitas Santri / Siswa</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Identitas Siswa</span>
                 
                 <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nama Lengkap Santri</label>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nama Lengkap Siswa</label>
                   <input
                     v-model="form.nama_lengkap"
                     type="text"
@@ -253,7 +253,7 @@
                     >
                       <option value="Ayah Kandung">Ayah Kandung</option>
                       <option value="Ibu Kandung">Ibu Kandung</option>
-                      <option value="Wali Santri">Wali Santri</option>
+                      <option value="Wali Siswa">Wali Siswa</option>
                     </select>
                   </div>
                 </div>
@@ -271,7 +271,7 @@
                   type="submit"
                   class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-sm"
                 >
-                  {{ isEditing ? 'Simpan Perubahan' : 'Tambah Santri' }}
+                  {{ isEditing ? 'Simpan Perubahan' : 'Tambah Siswa' }}
                 </button>
               </div>
 
@@ -388,28 +388,28 @@ const handleSubmit = async () => {
   try {
     if (isEditing.value) {
       await axios.put(`/api/admin/siswa/${editingId.value}`, form.value)
-      successMsg.value = 'Data santri berhasil diperbarui!'
+      successMsg.value = 'Data siswa berhasil diperbarui!'
     } else {
       await axios.post('/api/admin/siswa', form.value)
-      successMsg.value = 'Santri baru dan akun login wali berhasil disimpan!'
+      successMsg.value = 'Siswa baru dan akun login wali berhasil disimpan!'
     }
     showModal.value = false
     await fetchSiswa()
     setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menyimpan data santri'
+    errorMsg.value = err.response?.data?.error || 'Gagal menyimpan data siswa'
   }
 }
 
 const handleDelete = async (s) => {
-  if (!confirm(`Hapus data santri "${s.nama_lengkap}"?`)) return
+  if (!confirm(`Hapus data siswa "${s.nama_lengkap}"?`)) return
   try {
     await axios.delete(`/api/admin/siswa/${s.id}`)
-    successMsg.value = 'Data santri berhasil dihapus'
+    successMsg.value = 'Data siswa berhasil dihapus'
     await fetchSiswa()
     setTimeout(() => { successMsg.value = '' }, 4000)
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Gagal menghapus santri'
+    errorMsg.value = err.response?.data?.error || 'Gagal menghapus siswa'
   }
 }
 

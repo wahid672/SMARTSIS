@@ -8,7 +8,7 @@
           <div>
             <h1 class="text-xl font-bold text-slate-800">Master Data Kelas</h1>
             <p class="text-xs text-slate-500 mt-1">
-              Atur daftar rombel / kelas, tingkatan, serta wali kelas untuk santri/siswa.
+              Atur daftar rombel / kelas, tingkatan, serta wali kelas untuk siswa.
             </p>
           </div>
           <button

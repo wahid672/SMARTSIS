@@ -4,11 +4,11 @@
       <div class="max-w-6xl mx-auto py-2">
 
         <!-- ==================================================== -->
-        <!-- 1. TAMPILAN KHUSUS WALI SANTRI (REKAP PRESENSI ANAK) -->
+        <!-- 1. TAMPILAN KHUSUS WALI SISWA (REKAP PRESENSI ANAK)  -->
         <!-- ==================================================== -->
         <div v-if="authStore.isWali">
           <div class="mb-6">
-            <h1 class="text-xl font-bold text-slate-800">Laporan Kehadiran Santri</h1>
+            <h1 class="text-xl font-bold text-slate-800">Laporan Kehadiran Siswa</h1>
             <p class="text-xs text-slate-500 mt-1">
               Rekapitulasi kehadiran harian an. <span class="font-bold text-emerald-700">{{ authStore.activeSiswa?.nama_lengkap }}</span> ({{ authStore.activeSiswa?.kelas }})
             </p>
@@ -87,7 +87,7 @@
             <div>
               <h1 class="text-xl font-bold text-slate-800">Presensi & Absensi Harian</h1>
               <p class="text-xs text-slate-500 mt-1">
-                Catat kehadiran santri per rombel/kelas dengan tombol cepat.
+                Catat kehadiran siswa per rombel/kelas dengan tombol cepat.
               </p>
             </div>
             <button
@@ -147,12 +147,12 @@
             </div>
           </div>
 
-          <!-- Tabel Presensi Santri Satu Kelas -->
+          <!-- Tabel Presensi Siswa Satu Kelas -->
           <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <table class="w-full text-left text-xs text-slate-600">
               <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="py-3.5 px-4">Nama Santri</th>
+                  <th class="py-3.5 px-4">Nama Siswa</th>
                   <th class="py-3.5 px-4">NIS</th>
                   <th class="py-3.5 px-4 text-center">Status Kehadiran</th>
                   <th class="py-3.5 px-4">Catatan / Keterangan</th>

@@ -192,7 +192,7 @@ func SeedInitialData() {
 	}{
 		{"admin", "Super Admin / Tata Usaha", "Akses penuh sistem administrasi"},
 		{"guru", "Dewan Guru", "Akses presensi, nilai, dan jadwal mengajar"},
-		{"wali", "Wali Murid / Santri", "Akses data perkembangan siswa, presensi, dan SPP"},
+		{"wali", "Wali Murid", "Akses data perkembangan siswa, presensi, dan SPP"},
 	}
 
 	for _, r := range roles {
@@ -279,11 +279,11 @@ func SeedInitialData() {
 	posList := []struct {
 		nama, tipe, ket string
 	}{
-		{"SPP Santri", "masuk", "Penerimaan rutin iuran bulanan santri"},
+		{"SPP Siswa", "masuk", "Penerimaan rutin iuran bulanan siswa"},
 		{"Infaq Pembangunan", "masuk", "Penerimaan dana pembangunan/gedung"},
 		{"Dana Bantuan Operasional", "masuk", "Dana bantuan operasional sekolah/pesantren"},
-		{"Gaji Staf & Dewan Guru", "keluar", "Pengeluaran rutin honor dewan asatidz dan staf"},
-		{"Operasional Dapur & Santri", "keluar", "Pengeluaran makan & konsumsi harian"},
+		{"Gaji Staf & Dewan Guru", "keluar", "Pengeluaran rutin honor dewan guru dan staf"},
+		{"Operasional Siswa & Kegiatan", "keluar", "Pengeluaran kegiatan siswa & sarana harian"},
 		{"Listrik, Air & Internet", "keluar", "Biaya utilitas sarana dan prasarana"},
 	}
 	for _, p := range posList {
@@ -291,9 +291,9 @@ func SeedInitialData() {
 	}
 
 	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
-		VALUES (1, 'SPP Santri Bulanan', 'bulanan', 350000, 'SPP reguler termasuk asrama & konsumsi')`)
+		VALUES (1, 'SPP Siswa Bulanan', 'bulanan', 350000, 'SPP reguler siswa')`)
 	DB.Exec(`INSERT OR IGNORE INTO pos_tagihan (id, nama_tagihan, tipe_periode, nominal, keterangan)
-		VALUES (2, 'Daftar Ulang Tahunan', 'tahunan', 1500000, 'Iuran tahunan fasilitas dan seragam santri')`)
+		VALUES (2, 'Daftar Ulang Tahunan', 'tahunan', 1500000, 'Iuran tahunan fasilitas dan seragam siswa')`)
 
 	// Generate contoh tagihan siswa untuk 2 siswa demo
 	DB.Exec(`INSERT OR IGNORE INTO tagihan_siswa (id, siswa_id, pos_tagihan_id, tahun_ajaran_id, periode, nominal, terbayar, status, tanggal_bayar)
