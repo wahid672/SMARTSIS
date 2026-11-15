@@ -12,9 +12,12 @@
           <!-- HERO BRANDING PANEL (LEFT DESKTOP / TOP MOBILE)      -->
           <!-- ==================================================== -->
           <section
-            class="lg:w-5/12 pattern-overlay relative p-5 sm:p-7 lg:p-8 text-white flex flex-col justify-between overflow-hidden"
+            class="lg:w-5/12 relative p-5 sm:p-7 lg:p-8 text-white flex flex-col justify-between overflow-hidden"
             :style="{ backgroundColor: settingsStore.currentTheme.base, backgroundImage: settingsStore.currentTheme.gradient }"
           >
+            <!-- Dot Matrix Pattern Overlay (matching Stitch design reference) -->
+            <div aria-hidden="true" class="absolute inset-0 bg-dot-pattern pointer-events-none opacity-80"></div>
+
             <!-- Glow Aesthetic Backdrops -->
             <div class="absolute -top-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -35,7 +38,14 @@
                   <ion-icon v-else :icon="schoolOutline" class="text-2xl" :style="{ color: settingsStore.currentTheme.primary }"></ion-icon>
                 </div>
                 <div>
-                  <span class="inline-block text-[9px] uppercase tracking-wider font-bold text-white/90 bg-black/25 px-2 py-0.5 rounded-full border border-white/20">
+                  <span
+                    class="inline-block text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border shadow-sm"
+                    :style="{
+                      backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      color: settingsStore.currentTheme.accent
+                    }"
+                  >
                     Sistem Terpadu
                   </span>
                   <h1 class="text-lg sm:text-xl font-black tracking-tight text-white mt-0.5">
@@ -46,8 +56,11 @@
 
               <!-- Institution Title & Motto -->
               <div class="space-y-2 sm:space-y-2.5">
-                <div class="inline-flex items-center gap-1.5 text-white/90 font-semibold tracking-wide text-[11px] uppercase">
-                  <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div
+                  class="inline-flex items-center gap-1.5 font-semibold tracking-wide text-[11px] uppercase"
+                  :style="{ color: settingsStore.currentTheme.accent }"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                   </svg>
                   <span>{{ settingsStore.school_name }}</span>
@@ -65,20 +78,23 @@
 
             <!-- Feature Badges -->
             <div class="relative z-10 pt-4 sm:pt-6 mt-auto">
-              <p class="text-[10px] uppercase tracking-wider text-white/80 font-semibold mb-2">
+              <p
+                class="text-[10px] uppercase tracking-wider font-semibold mb-2"
+                :style="{ color: settingsStore.currentTheme.accent }"
+              >
                 Layanan Terpadu Lembaga:
               </p>
               <div class="flex flex-wrap gap-1.5 overflow-x-auto no-scrollbar pb-1">
                 <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   Portal Akademik
                 </span>
                 <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                   Tahfidz & Rapor
                 </span>
                 <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   E-Presensi & Izin
                 </span>
               </div>
@@ -371,15 +387,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Islamic & Dot Pattern matching the Stitch design */
-.islamic-pattern {
-  background-color: #064e3b;
-  background-image: radial-gradient(circle at 100% 150%, #047857 24%, #064e3b 50%, #022c22 85%);
-}
-
-.pattern-overlay {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1.5px, transparent 0);
-  background-size: 24px 24px;
+/* Dot Pattern overlay isolated from background gradient */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
 }
 
 .glass-pill {
