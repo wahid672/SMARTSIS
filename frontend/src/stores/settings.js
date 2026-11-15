@@ -134,6 +134,7 @@ export const useSettingsStore = defineStore('settings', {
     app_name: cachedSettings.app_name || 'SMARTSIS',
     school_name: cachedSettings.school_name || 'Pondok Pesantren & Madrasah Terpadu',
     tagline: cachedSettings.tagline || 'Sistem Informasi Sekolah & Pesantren Terpadu',
+    description: cachedSettings.description || 'Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi.',
     phone: cachedSettings.phone || '',
     email: cachedSettings.email || '',
     address: cachedSettings.address || '',
@@ -154,6 +155,7 @@ export const useSettingsStore = defineStore('settings', {
           this.app_name = res.data.app_name || 'SMARTSIS'
           this.school_name = res.data.school_name || 'Sistem Informasi Sekolah'
           this.tagline = res.data.tagline || ''
+          this.description = res.data.description || 'Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi.'
           this.phone = res.data.phone || ''
           this.email = res.data.email || ''
           this.address = res.data.address || ''
@@ -168,6 +170,7 @@ export const useSettingsStore = defineStore('settings', {
             app_name: this.app_name,
             school_name: this.school_name,
             tagline: this.tagline,
+            description: this.description,
             phone: this.phone,
             email: this.email,
             address: this.address,

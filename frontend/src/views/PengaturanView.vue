@@ -70,13 +70,25 @@
 
           <!-- Tagline / Slogan -->
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Tagline / Deskripsi Singkat</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tagline / Motto Lembaga</label>
             <input
               v-model="form.tagline"
               type="text"
-              placeholder="Contoh: Sistem Informasi Sekolah & Pesantren Terpadu"
+              placeholder="Contoh: Membentuk Generasi Unggul, Berakhlak Mulia, dan Berprestasi."
               class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-800"
             />
+          </div>
+
+          <!-- Deskripsi Platform / Sambutan (Halaman Login) -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Platform / Sambutan (Halaman Login)</label>
+            <textarea
+              v-model="form.description"
+              rows="2"
+              placeholder="Contoh: Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi."
+              class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-800"
+            ></textarea>
+            <p class="text-[10px] text-slate-400 mt-1">Teks narasi yang tampil di panel kiri halaman login di bawah motto/tagline lembaga.</p>
           </div>
 
           <!-- Kontak (No WhatsApp & Email) -->
@@ -183,6 +195,7 @@ const form = ref({
   app_name: '',
   school_name: '',
   tagline: '',
+  description: '',
   phone: '',
   email: '',
   address: '',
@@ -196,6 +209,7 @@ onMounted(async () => {
     app_name: settingsStore.app_name,
     school_name: settingsStore.school_name,
     tagline: settingsStore.tagline,
+    description: settingsStore.description,
     phone: settingsStore.phone,
     email: settingsStore.email,
     address: settingsStore.address,

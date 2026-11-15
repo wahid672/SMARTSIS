@@ -381,6 +381,7 @@ func SeedInitialData() {
 		{"app_name", "SMARTSIS", "Nama Singkat Aplikasi"},
 		{"school_name", "Pondok Pesantren & Madrasah Terpadu", "Nama Resmi Lembaga / Sekolah"},
 		{"tagline", "Sistem Informasi Sekolah & Pesantren Terpadu", "Motto atau Deskripsi Singkat"},
+		{"description", "Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi.", "Deskripsi Platform / Sambutan Halaman Login"},
 		{"phone", "08123456789", "Nomor Kontak / WhatsApp Resmi Lembaga"},
 		{"email", "info@sekolah.sch.id", "Email Resmi Lembaga"},
 		{"address", "Jl. Pesantren No. 01, Kompleks Pendidikan", "Alamat Lembaga"},

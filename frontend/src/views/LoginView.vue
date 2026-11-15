@@ -71,32 +71,36 @@
                 </h2>
 
                 <p class="text-white/80 text-[11px] leading-relaxed hidden sm:block">
-                  Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi.
+                  {{ settingsStore.description || 'Platform komprehensif penghubung civitas lembaga, dewan guru, siswa, dan wali murid dalam satu ekosistem digital terintegrasi.' }}
                 </p>
               </div>
             </div>
 
-            <!-- Feature Badges -->
+            <!-- Alamat Lembaga (Bottom Hero Panel) -->
             <div class="relative z-10 pt-4 sm:pt-6 mt-auto">
-              <p
-                class="text-[10px] uppercase tracking-wider font-semibold mb-2"
-                :style="{ color: settingsStore.currentTheme.accent }"
-              >
-                Layanan Terpadu Lembaga:
-              </p>
-              <div class="flex flex-wrap gap-1.5 overflow-x-auto no-scrollbar pb-1">
-                <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  Portal Akademik
-                </span>
-                <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                  Tahfidz & Rapor
-                </span>
-                <span class="glass-pill text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-white shadow-sm whitespace-nowrap">
-                  <svg class="w-3 h-3 shrink-0" :style="{ color: settingsStore.currentTheme.accent }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  E-Presensi & Izin
-                </span>
+              <div class="glass-pill rounded-xl p-2.5 sm:p-3 border border-white/15 shadow-sm">
+                <div class="flex items-start gap-2.5">
+                  <div
+                    class="w-7 h-7 rounded-lg bg-black/20 flex items-center justify-center shrink-0 mt-0.5 shadow-inner"
+                    :style="{ color: settingsStore.currentTheme.accent }"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p
+                      class="text-[9px] uppercase tracking-wider font-bold mb-0.5"
+                      :style="{ color: settingsStore.currentTheme.accent }"
+                    >
+                      Alamat Lembaga
+                    </p>
+                    <p class="text-white/90 text-[11px] leading-relaxed line-clamp-2">
+                      {{ settingsStore.address || 'Alamat lembaga belum diatur di Identitas Lembaga.' }}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
