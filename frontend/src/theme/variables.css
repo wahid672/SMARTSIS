@@ -31,18 +31,18 @@ ion-split-pane {
   --side-max-width: 280px;
 }
 
-/* Memastikan latar belakang ion-menu dan ion-content di sidebar berwarna biru navy solid & bersih */
+/* Latar belakang dinamis ion-menu dan ion-content di sidebar sesuai tema lembaga */
 ion-menu {
-  --background: #0b3b60;
+  --background: var(--theme-sidebar-bg, #064e3b);
 }
 
 ion-menu ion-content {
-  --background: #0b3b60 !important;
-  background-color: #0b3b60 !important;
+  --background: var(--theme-sidebar-bg, #064e3b) !important;
+  background-color: var(--theme-sidebar-bg, #064e3b) !important;
 }
 
 .sidebar-wave-container {
-  background: #0b3b60 !important;
+  background: var(--theme-sidebar-bg, #064e3b) !important;
   position: relative;
 }
 

@@ -3,13 +3,13 @@
     <ion-split-pane content-id="main-content" when="md">
       
       <!-- SIDEBAR UNTUK TABLET & DESKTOP (MD/LG SCREEN) -->
-      <ion-menu content-id="main-content" type="overlay" class="border-r border-sky-950/20 shadow-xl" style="--background: #0f3057;">
-        <ion-content class="sidebar-wave-container text-white" :fullscreen="true" style="--background: #0f3057; background: #0f3057;">
+      <ion-menu content-id="main-content" type="overlay" class="border-r border-black/10 shadow-xl" :style="{ '--background': settingsStore.currentTheme.sidebarBg }">
+        <ion-content class="sidebar-wave-container text-white" :fullscreen="true" :style="{ '--background': settingsStore.currentTheme.sidebarBg, background: settingsStore.currentTheme.sidebarBg }">
           
           <div class="relative z-10 flex flex-col min-h-full">
             
             <!-- Header Sidebar dengan Brand Sekolah & Badge Role Kuning Emas -->
-            <div class="p-5 border-b border-white/10 flex items-center gap-3 bg-slate-950/20 backdrop-blur-sm">
+            <div class="p-5 border-b border-white/10 flex items-center gap-3 backdrop-blur-sm" :style="{ background: settingsStore.currentTheme.sidebarHeader }">
               <div class="w-12 h-12 flex items-center justify-center shrink-0">
                 <img v-if="settingsStore.logo_url" :src="settingsStore.logo_url" alt="Logo" class="w-full h-full object-contain drop-shadow" />
                 <div v-else class="w-12 h-12 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-bold text-lg shadow-sm">

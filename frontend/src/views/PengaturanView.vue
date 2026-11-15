@@ -112,6 +112,38 @@
             ></textarea>
           </div>
 
+          <!-- Pilihan Warna Tema Lembaga (Login & Sidebar) -->
+          <div class="border-t border-slate-100 pt-5">
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-800">Warna Tema Lembaga</label>
+              <p class="text-[11px] text-slate-500 mt-0.5">
+                Pilih palet warna resmi lembaga Anda. Warna ini otomatis diterapkan serasi pada <b>Halaman Login</b> dan <b>Sidebar Dashboard</b>.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div
+                v-for="p in themePalettes"
+                :key="p.id"
+                @click="form.theme_color = p.id"
+                class="p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-3 relative select-none"
+                :class="form.theme_color === p.id ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20 shadow-sm' : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'"
+              >
+                <!-- Color Circle / Swatch -->
+                <div
+                  class="w-10 h-10 rounded-xl shadow-md flex items-center justify-center shrink-0 border border-white/20 text-white"
+                  :style="{ backgroundColor: p.base, backgroundImage: p.gradient }"
+                >
+                  <ion-icon v-if="form.theme_color === p.id" :icon="checkmarkOutline" class="text-base font-black"></ion-icon>
+                </div>
+                <div class="min-w-0">
+                  <span class="block text-xs font-bold text-slate-800 truncate">{{ p.name }}</span>
+                  <span class="block text-[10px] text-slate-400 truncate">{{ p.subtitle }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Tombol Simpan -->
           <div class="pt-3 border-t border-slate-100 flex justify-end">
             <button
@@ -134,12 +166,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { IonPage, IonContent, IonIcon } from '@ionic/vue'
-import { schoolOutline, saveOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons'
-import { useSettingsStore } from '@/stores/settings'
+import { schoolOutline, saveOutline, checkmarkCircleOutline, alertCircleOutline, checkmarkOutline } from 'ionicons/icons'
+import { useSettingsStore, THEME_PALETTES } from '@/stores/settings'
 import { useAuthStore } from '@/stores/auth'
 
 const settingsStore = useSettingsStore()
 const authStore = useAuthStore()
+
+const themePalettes = Object.values(THEME_PALETTES)
 
 const saving = ref(false)
 const successMsg = ref('')
@@ -152,7 +186,8 @@ const form = ref({
   phone: '',
   email: '',
   address: '',
-  logo_url: ''
+  logo_url: '',
+  theme_color: 'emerald'
 })
 
 onMounted(async () => {
@@ -164,7 +199,8 @@ onMounted(async () => {
     phone: settingsStore.phone,
     email: settingsStore.email,
     address: settingsStore.address,
-    logo_url: settingsStore.logo_url
+    logo_url: settingsStore.logo_url,
+    theme_color: settingsStore.theme_color || 'emerald'
   }
 })
 
